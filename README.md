@@ -19,14 +19,15 @@ The current base classes are:
 
 ### Test.Automation.Data
 This project creates a NuGet package containing a SqlHelper class that tests can use to retrieve data from a SQL database.  
-SqlHelper handles all the connection, command, and reader resources automatically, create a SQL statement or use a stored procedure and call one of the execute methods:
+SqlHelper handles all the connection, command, and reader resources automatically.
+Write an SQL statement or call a stored procedure and pass the sql string to one of the execute methods:
 - ExecuteDataTable
 - ExecuteReader
 - ExecuteScalar
 - ExecuteNonQuery
 
 In addition, there is a Common class that contains common SQL queries used for database BVT tests.
-This includes users, roles and schema objects.
+This includes queries for users, user roles and schema objects.
 
 ### Test.Automation.Api
 This project creates an API base class that can be used in a project to create methods that call JSON REST API endpoints.  
@@ -55,9 +56,9 @@ The solution includes the following WebDriver projects:
 |Browser | WebDriver | Download |Notes|
 |-----|-----|-----|----|
 | [Chrome](https://www.google.com/chrome/browser/desktop/index.html?system=true&standalone=1) | chromedriver.exe | [ChromeDriver](https://sites.google.com/a/chromium.org/chromedriver/downloads) | Use Chrome's 'alternative installer'<br>Recommended for testing Web applications built with moden javascript frameworks like React and Ember |
-| HeadLess Chrome | chromedriver.exe | see above | headless web testing |
+| HeadLess Chrome | chromedriver.exe | see above | Headless web testing<br>Set `IsHeadless=true` in App.config |
 | [Internet Explorer (IE)](https://support.microsoft.com/en-us/help/17621/internet-explorer-downloads) | IEDriverServer.exe | [IEDriverServer](http://selenium-release.storage.googleapis.com/index.html) | Windows default browser prior to 10 |
-| [Microsoft Edge](https://www.microsoft.com/en-us/windows/microsoft-edge#AoPhgFHFcSwpqU6Z.97) | MicrosoftWebDriver.exe | [MicrosoftWebDriver](https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/)| Windows 10 default browser |
+| [Microsoft Edge](https://www.microsoft.com/en-us/windows/microsoft-edge#AoPhgFHFcSwpqU6Z.97) | MicrosoftWebDriver.exe | [MicrosoftWebDriver](https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/)| Windows 10 only |
 | PhantomJS | phantomjs.exe | [PhantomJS](http://phantomjs.org/download.html) | PhantomJS is **deprecated!**<br>The project has been abandoned.<br>Use Headless Chrome for headless web testing |
 
 ## NUnit Test Framework Workflow
@@ -80,7 +81,7 @@ The solution includes the following WebDriver projects:
   - If the test fails (or is run in debug mode) you can find debugging information in the output window.
     - A screenshot is automatically taken for failed tests (and in debug mode.)
     - WebDriver logs are automatically created for failed tests (and in debug mode.)
-  - By default, no output is written for tests that pass.
+  - By default, **no output** is written for tests that pass.
 
 
 ### Example WebDriver Test
@@ -158,12 +159,14 @@ You can use this file as a reference if the original file is deleted or broken.
   <browserSettings>
     <!--
     *-Denotes default value. Settings are optional unless noted otherwise.
-    Name                    =  WebDriver browser name.                           [ *Chrome | IE | PhantomJS | Edge ]
+    Name                    =  WebDriver browser name.                           [ *Chrome | IE | Edge ]
     Position                =  Browser window position. (from upper left corner) [ *(10, 10) ]
     Size                    =  Browser window size. (width, height)              [ *(1600, 900) ] 
     IsMaximized             =  Maximize browser window. (overrides window size)  [ true | *false ]
     HideCommandPromptWindow =  Hide WebDriver service command window.            [ *true | false ] 
     DefaultWaitTimeout      =  Default WebDriver Wait timeout value. (seconds)   [ *3 ]
+    DownloadDefaultDir      =  Default Chrome download directory                 (Chrome only)
+    IsHeadless              =  Run the Chrome browser in a headless environment  (Chrome only)[ true | *false] 
     ===========================================================================
     -->
     <LOCAL Name="Chrome" />

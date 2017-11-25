@@ -14,6 +14,7 @@ The WebDriver properties are configured using an App.config file.</Description>
     <PackageTags>Selenium WebDriver NUnit</PackageTags>
     <PackageReleaseNotes>Initial Release (2017-02-18)</PackageReleaseNotes>
     <Company>Test.Automation.Selenium</Company>
+    <PackageIconUrl />
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

@@ -62,7 +62,7 @@ You may want to add other NuGet packages useful for WebDriver tests:
   - If the test fails (or is run in debug mode) you can find debugging information in the output window.
     - A screenshot is automatically taken for failed tests (and in debug mode.)
     - WebDriver logs are automatically created for failed tests (and in debug mode.)
-  - By default, no output is written for tests that pass.
+  - By default, **no output** is written for tests that pass.
 
 ## NUnitSeleniumBase Example
 ```
@@ -139,12 +139,14 @@ You can use this file as a reference if the original file is deleted or broken.
   <browserSettings>
     <!--
     *-Denotes default value. Settings are optional unless noted otherwise.
-    Name                    =  WebDriver browser name.                           [ *Chrome | IE | PhantomJS | Edge ]
+    Name                    =  WebDriver browser name.                           [ *Chrome | IE | Edge ]
     Position                =  Browser window position. (from upper left corner) [ *(10, 10) ]
     Size                    =  Browser window size. (width, height)              [ *(1600, 900) ] 
     IsMaximized             =  Maximize browser window. (overrides window size)  [ true | *false ]
     HideCommandPromptWindow =  Hide WebDriver service command window.            [ *true | false ] 
     DefaultWaitTimeout      =  Default WebDriver Wait timeout value. (seconds)   [ *3 ]
+    DownloadDefaultDir      =  Default Chrome download directory                 (Chrome only)
+    IsHeadless              =  Run the Chrome browser in a headless environment  (Chrome only)[ true | *false] 
     ===========================================================================
     -->
     <LOCAL Name="Chrome" />
