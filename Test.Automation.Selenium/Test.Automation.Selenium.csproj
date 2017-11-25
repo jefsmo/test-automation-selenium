@@ -2,6 +2,34 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>jefsmo</Authors>
+    <Description>Provides a base class for test projects running Selenium WebDriver tests.
+The base class supports NUnit test framework.
+The WebDriver properties are configured using an App.config file.</Description>
+    <Copyright>© 2017 jefsmo</Copyright>
+    <PackageProjectUrl>https://github.com/jefsmo</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/jefsmo</RepositoryUrl>
+    <RepositoryType>c#</RepositoryType>
+    <PackageTags>Selenium WebDriver</PackageTags>
+    <PackageReleaseNotes>Initial Release (2017-02-18)</PackageReleaseNotes>
   </PropertyGroup>
+
+  <ItemGroup>
+    <COMReference Include="NetFwTypeLib.dll">
+      <Guid>58fbcf7c-e7a9-467c-80b3-fc65e8fcca08</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+    </COMReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NUnit" Version="3.9.0" />
+    <PackageReference Include="Selenium.WebDriver" Version="3.7.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.4.0" />
+  </ItemGroup>
 
 </Project>

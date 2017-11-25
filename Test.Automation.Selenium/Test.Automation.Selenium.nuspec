@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<package >
+  <metadata>
+    <id>Test.Automation.Selenium</id>
+    <version>1.0.0</version>
+    <title>Test.Automation.Selenium</title>
+    <authors>jefsmo</authors>
+    <owners>jefsmo</owners>
+    <projectUrl>https://github.com/jefsmo/Test.Automation</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/jefsmo/Test.Automation/master/Test.Automation.Selenium/selenium-logo.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>Provides a base class for test projects running Selenium WebDriver tests.</summary>
+    <description>
+      Provides a base class for test projects running Selenium WebDriver tests.
+      The base class supports NUnit test framework.
+      The WebDriver properties are configured using an App.config file.
+    </description>
+    <releaseNotes>Initial Release (2017-02-18)
+    </releaseNotes>
+    <copyright>© 2017 jefsmo</copyright>
+    <tags>Selenium WebDriver NUnit</tags>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System.Configuration" targetFramework="net461" />
+    </frameworkAssemblies>
+    <dependencies>
+      <group targetFramework="net461">
+        <dependency id="NUnit" version="3.9.0" />
+        <dependency id="NUnit3TestAdapter" version="3.9.0" />
+        <dependency id="Selenium.WebDriver" version="3.7.0" />
+        <dependency id="Selenium.Support" version="3.7.0" />
+        <dependency id="Shouldly" version="2.8.3" />
+        <dependency id="Test.Automation.ChromeDriver" version="2.33.0" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\Release\Test.Automation.Selenium.xml" target="lib\net461" />
+    <file src="bin\Release\Test.Automation.Selenium.dll" target="lib\net461\" />
+    <file src="bin\Release\Test.Automation.Selenium.pdb" target="lib\net461\" />
+    <file src="Readme.Selenium.md" target="content" />
+    <file src="App.config.transform" target="content" />
+    <file src="*.xdt" target="content" />
+    <file src="*.ps1" target="tools" />
+  </files>
+</package>
