@@ -8,10 +8,10 @@ namespace Test.Automation.Selenium
     public class TestData
     {
         /// <summary>
-        /// Initializes a new instance of the CurrentTestData class.
+        /// Initializes a new instance of the TestData class.
         /// </summary>
-        /// <param name="testContext"></param>
-        /// <param name="testAttributes"></param>
+        /// <param name="testContext">The current test framework test context.</param>
+        /// <param name="testAttributes">The test attributes decorating the test.</param>
         public TestData(ITestContext testContext, ITestAttributes testAttributes)
         {
             TestContext = testContext;

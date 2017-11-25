@@ -8,11 +8,16 @@
 The base class supports NUnit test framework.
 The WebDriver properties are configured using an App.config file.</Description>
     <Copyright>© 2017 jefsmo</Copyright>
-    <PackageProjectUrl>https://github.com/jefsmo</PackageProjectUrl>
+    <PackageProjectUrl></PackageProjectUrl>
     <RepositoryUrl>https://github.com/jefsmo</RepositoryUrl>
-    <RepositoryType>c#</RepositoryType>
-    <PackageTags>Selenium WebDriver</PackageTags>
+    <RepositoryType>Git</RepositoryType>
+    <PackageTags>Selenium WebDriver NUnit</PackageTags>
     <PackageReleaseNotes>Initial Release (2017-02-18)</PackageReleaseNotes>
+    <Company>Test.Automation.Selenium</Company>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netstandard2.0\Test.Automation.Selenium.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,5 +36,9 @@ The WebDriver properties are configured using an App.config file.</Description>
     <PackageReference Include="Selenium.WebDriver" Version="3.7.0" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.4.0" />
   </ItemGroup>
+
+  <Target Name="CopyPackage" AfterTargets="Pack">
+    <Copy SourceFiles="$(OutputPath)..\$(PackageId).$(PackageVersion).nupkg" DestinationFolder="C:\Packages\" />
+  </Target>
 
 </Project>

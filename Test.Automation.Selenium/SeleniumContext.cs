@@ -33,14 +33,12 @@ namespace Test.Automation.Selenium
         /// <summary>
         /// EnvironmentSettings section data from App.config.
         /// </summary>
-        // ReSharper disable once MemberCanBePrivate.Global
         public static EnvironmentSettings EnvironmentSettings
             => ConfigurationManager.GetSection("environmentSettings/" + TestRunSetting) as EnvironmentSettings;
 
         /// <summary>
         /// The WebDriver instance created for each test.
         /// </summary>
-        // ReSharper disable once MemberCanBePrivate.Global
         public IWebDriver Driver { get; set; }
 
         /// <summary>
@@ -54,7 +52,7 @@ namespace Test.Automation.Selenium
         /// <summary>
         /// Initializes a single DriverService used by all the tests.
         /// </summary>
-        /// <param name="binariesDir"></param>
+        /// <param name="binariesDir">The directory that contains the binaries used by the test when the test is run.</param>
         public static void StartTestRun(string binariesDir)
         {
             // Only a single Service instance is started for the entire test run.
@@ -65,7 +63,7 @@ namespace Test.Automation.Selenium
         /// <summary>
         /// Closes the DriverService and deletes DriverService logs.
         /// </summary>
-        /// <param name="binariesDir"></param>
+        /// <param name="binariesDir">The directory that contains the binaries used by the test when the test is run.</param>
         public static void StopTestRun(string binariesDir)
         {
             Service?.Dispose();
@@ -104,7 +102,7 @@ namespace Test.Automation.Selenium
         /// <summary>
         /// Closes the WebDriver instance and logs test information if the test fails or is run in debug mode.
         /// </summary>
-        /// <param name="testData">The current test data from the test context.</param>
+        /// <param name="testData">The current test data from the test framework test context.</param>
         public void StopTest(TestData testData)
         {
             // Log only if test status is not 'Passed' or if debugger is attached.
@@ -125,13 +123,11 @@ namespace Test.Automation.Selenium
 
             Driver?.Quit();
         }
+
         #endregion
 
         #region PRIVATE METHODS
 
-        /// <summary>
-        /// Writes test repro info to the output window.
-        /// </summary>
         private void LogTestInfo(TestData testData)
         {
             var attributes = new Dictionary<string,string>
@@ -243,9 +239,6 @@ namespace Test.Automation.Selenium
             Console.WriteLine($"{new string('=', 80)}");
         }
 
-        /// <summary>
-        /// Saves the WebDriver log(s) as LOG file(s).
-        /// </summary>
         private void LogWebDriverLogs(TestData testData)
         {
             if (Driver == null) return;
@@ -292,9 +285,6 @@ namespace Test.Automation.Selenium
             WriteFilePathToTestOutput(logPath);
         }
 
-        /// <summary>
-        /// Saves the Service log as an MD file.
-        /// </summary>
         private void LogDriverServiceLog(TestData testData)
         {
             switch (BrowserSettings.Name)
@@ -316,10 +306,6 @@ namespace Test.Automation.Selenium
             }
         }
 
-        /// <summary>
-        /// Rename the service log to use the test name.
-        /// </summary>
-        /// <param name="browserName"></param>
         private void RenameServiceLog(TestData testData, string browserName)
         {
             var sourceName = browserName + ".log";
@@ -341,9 +327,6 @@ namespace Test.Automation.Selenium
             WriteFilePathToTestOutput(dest);
         }
 
-        /// <summary>
-        /// Saves the browser screenshot as a PNG file.
-        /// </summary>
         private string LogScreenshot(TestData testData)
         {
             if (Driver == null) return null;
@@ -366,9 +349,6 @@ namespace Test.Automation.Selenium
             return ssFile;
         }
 
-        /// <summary>
-        /// Saves the browser Page Source as an HTML file.
-        /// </summary>
         private void LogPageSource(TestData testData)
         {
             if (Driver == null) return;
@@ -421,9 +401,6 @@ namespace Test.Automation.Selenium
             return file;
         }
 
-        /// <summary>
-        /// Maximize or resize browser window based on App.config BrowserSettings settings.
-        /// </summary>
         private void SetBrowserWindow()
         {
             var currentWindow = Driver.Manage().Window;
@@ -446,11 +423,6 @@ namespace Test.Automation.Selenium
             }
         }
 
-        /// <summary>
-        /// Writes the file path as a file URI to the console.
-        /// This creates a hyperlink to the file in a text editor.
-        /// </summary>
-        /// <param name="file"></param>
         private static void WriteFilePathToTestOutput(string file)
         {
             if (File.Exists(file))
@@ -476,10 +448,6 @@ namespace Test.Automation.Selenium
             }
         }
 
-        /// <summary>
-        /// Gets a fully qualified DNS Host name (FQDN) for the machine.
-        /// </summary>
-        /// <returns>A fully qualified DNS Host name (FQDN)</returns>
         private static string GetFqdn()
         {
             var domainName = IPGlobalProperties.GetIPGlobalProperties().DomainName;
