@@ -61,7 +61,7 @@ namespace Test.Automation.Selenium.Factories
 
             try
             {
-                return new RemoteWebDriver(service.ServiceUrl, edgeOptions.ToCapabilities());
+                return new RemoteWebDriver(service.ServiceUrl, edgeOptions);
             }
             catch (InvalidOperationException ioEx)
             {
@@ -84,7 +84,6 @@ namespace Test.Automation.Selenium.Factories
                     "headless",
                     "disable-gpu"
                 });
-
             }
 
             if (browser.IsMaximized)
@@ -111,7 +110,7 @@ namespace Test.Automation.Selenium.Factories
 
             try
             {
-                return new RemoteWebDriver(service.ServiceUrl, chromeOptions.ToCapabilities());
+                return new RemoteWebDriver(service.ServiceUrl, chromeOptions);
             }
             catch (InvalidOperationException ioEx)
             {
@@ -134,7 +133,7 @@ namespace Test.Automation.Selenium.Factories
 
             try
             {
-                return new RemoteWebDriver(service.ServiceUrl, ieOptions.ToCapabilities());
+                return new RemoteWebDriver(service.ServiceUrl, ieOptions);
             }
             catch (InvalidOperationException ioEx)
             {

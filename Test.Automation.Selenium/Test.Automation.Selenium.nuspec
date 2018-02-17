@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Test.Automation.Selenium</id>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <title>Test.Automation.Selenium</title>
     <authors>jefsmo</authors>
     <owners>jefsmo</owners>

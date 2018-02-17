@@ -1,24 +1,39 @@
 # Test.Automation.* Projects
 **README.md**
 
-The Test.Automation.* projects create NuGet packages for test automation using Selenium WebDriver.  
+## History
+|Date|Notes|
+|---|---|
+|2018-02-17|Bug fixes|
+|2017-12-05|Initial Release|
+
+The Test.Automation.* projects create NuGet packages for test automation.  
 The NuGet packages can be generated locally to a packages folder on your hard drive.  
+`> C:\Packages`
 
 Once you have created the packages locally, use Visual Studio NuGet package manager to create a local package source.  
 Add packages to your test project with NuGet package manager pointing to the local package source.
 
+### Test.Automation.Base
+This project provides common base class logging methods for test automation test class.  
+The test attributes and test context directory locations are logged to the console window if the test does not pass or is run in debug mode.
+
+The base class is:  
+   - **TestAutomationBase**
+
 ### Test.Automation.Selenium
-This project creates a NuGet package containing a base class for NUnit test framework.  
+This project creates a NuGet package containing that enables Selenium WebDriver tests.  
+The package contains a base class for the NUnit test framework.  
 Once a test class inherits from the base class, it just needs to pass a URL to the WebDriver to start a Selenium test.  
 The base class handles WebDriver creation and disposal.  
 Each test gets a new WebDriver instance.  
 It also logs test repro data when a test fails or is run in debug mode.  
 
-The current base classes are:
-- NUnitSeleniumBase
+The base class is:
+- **NUnitSeleniumBase**
 
 ### Test.Automation.Data
-This project creates a NuGet package containing a SqlHelper class that tests can use to retrieve data from a SQL database.  
+This project creates a NuGet package containing a **SqlHelper** class that tests can use to retrieve data from a SQL database.  
 SqlHelper handles all the connection, command, and reader resources automatically.
 Write an SQL statement or call a stored procedure and pass the sql string to one of the execute methods:
 - ExecuteDataTable
@@ -26,7 +41,7 @@ Write an SQL statement or call a stored procedure and pass the sql string to one
 - ExecuteScalar
 - ExecuteNonQuery
 
-In addition, there is a Common class that contains common SQL queries used for database BVT tests.
+In addition, it provides the **Common** class that contains common SQL queries used for database BVT tests.
 This includes queries for users, user roles and schema objects.
 
 ### Test.Automation.Api
@@ -112,7 +127,6 @@ namespace UnitTestProject1
 }
 ```
 ### Debug Mode Output Window
-![BingTitle_ShouldBeBing.png](Test.Automation.Selenium/BingTitle_ShouldBeBing.png)
 
 ## Example App Config File
 An App.config file should be installed by the Test.Automation.Selenium package.  
@@ -143,8 +157,8 @@ You can use this file as a reference if the original file is deleted or broken.
 
   <connectionStrings>
     <clear />
-    <add name="LOCAL" providerName="System.Data.SqlClient" connectionString="Data Source=MyLocalSqlServer;" />
-    <add name="TEST" providerName="System.Data.SqlClient" connectionString="Data Source=MyLocalSqlServer;" />
+    <add name="LOCAL" providerName="System.Data.SqlClient" connectionString="Data Source=localhost;" />
+    <add name="TEST" providerName="System.Data.SqlClient" connectionString="Data Source=localhost;" />
   </connectionStrings>
 
   <environmentSettings>

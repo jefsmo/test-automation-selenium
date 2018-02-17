@@ -65,13 +65,13 @@ namespace Test.Automation.Selenium.Factories
         {
             var logPath = Path.Combine(binariesPath, "chromedriver.log");
 
-            var chrome = ChromeDriverService.CreateDefaultService(binariesPath, "chromedriver.exe");
-            chrome.HideCommandPromptWindow = browser.HideCommandPromptWindow;
-            if (Debugger.IsAttached) chrome.LogPath = logPath;
-            chrome.EnableVerboseLogging = false;     // Sets DEBUG logging level for file in .LogPath path.
-            chrome.Port = 9515;
+            var chromedriverService = ChromeDriverService.CreateDefaultService(binariesPath, "chromedriver.exe");
+            chromedriverService.HideCommandPromptWindow = browser.HideCommandPromptWindow;
+            if (Debugger.IsAttached) chromedriverService.LogPath = logPath;
+            chromedriverService.EnableVerboseLogging = false;     // Sets DEBUG logging level for file in .LogPath path.
+            chromedriverService.Port = 9515;
 
-            return chrome;
+            return chromedriverService;
         }
 
         private static InternetExplorerDriverService CreateIeDriverService(BrowserSettings browser, string binariesPath)
@@ -81,13 +81,13 @@ namespace Test.Automation.Selenium.Factories
 
             ConfigureFirewallPortRule("Command line server for the IE driver", webDriver);
 
-            var ie = InternetExplorerDriverService.CreateDefaultService(binariesPath, "IEDriverServer.exe");
-            ie.HideCommandPromptWindow = browser.HideCommandPromptWindow;
-            if (Debugger.IsAttached) ie.LogFile = logFile;
-            ie.LoggingLevel = InternetExplorerDriverLogLevel.Info;    // Sets Logging level for file in .LogFile path.
-            ie.Port = 5555;
+            var ieDriverService = InternetExplorerDriverService.CreateDefaultService(binariesPath, "IEDriverServer.exe");
+            ieDriverService.HideCommandPromptWindow = browser.HideCommandPromptWindow;
+            if (Debugger.IsAttached) ieDriverService.LogFile = logFile;
+            ieDriverService.LoggingLevel = InternetExplorerDriverLogLevel.Info;    // Sets Logging level for file in .LogFile path.
+            ieDriverService.Port = 5555;
 
-            return ie;
+            return ieDriverService;
         }
 
         /// <summary>

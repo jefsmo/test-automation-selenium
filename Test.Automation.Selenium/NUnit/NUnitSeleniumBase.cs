@@ -1,7 +1,7 @@
 using NUnit.Framework;
 using OpenQA.Selenium;
+using Test.Automation.Base;
 using Test.Automation.Selenium.Settings;
-using TestContext = NUnit.Framework.TestContext;
 
 namespace Test.Automation.Selenium.NUnit
 {
@@ -9,38 +9,40 @@ namespace Test.Automation.Selenium.NUnit
     /// Represents an abstract base class for Selenium WebDriver test classes using NUnnit test framework.
     /// </summary>
     [TestFixture]
-    public abstract class NUnitSeleniumBase
+    public abstract class NUnitSeleniumBase : NUnitTestBase
     {
         /// <summary>
-        /// Gets the Selenium Context used by the base class.
+        /// Gets or sets the Selenium Context used by the base class.
         /// </summary>
-        private SeleniumContext SeleniumContext { get; }
+        private SeleniumContext SeleniumContext { get; set; }
+
+        /// <summary>
+        /// Gets the WebDriver instance created for each test.
+        /// </summary>
+        protected IWebDriver Driver { get; set; }
+
+        /// <summary>
+        /// Gets EnvironmentSettings section data from App.config.
+        /// </summary>
+        protected static EnvironmentSettings Settings { get; set; }
 
         /// <summary>
         /// Creates an instance of the NUnitSeleniumBase class.
         /// </summary>
-        protected NUnitSeleniumBase()
+        public NUnitSeleniumBase()
         {
             SeleniumContext = new SeleniumContext();
+            Driver = SeleniumContext.Driver;
+            Settings = SeleniumContext.EnvironmentSettings;
         }
-
-        /// <summary>
-        /// The WebDriver instance created for each test.
-        /// </summary>
-        public IWebDriver Driver => SeleniumContext.Driver;
-
-        /// <summary>
-        /// EnvironmentSettings section data from App.config (via SeleniumContext.)
-        /// </summary>
-        public static EnvironmentSettings Settings => SeleniumContext.EnvironmentSettings;
-
+        
         /// <summary>
         /// Calls SeleniumContext.StartTestRun() to intialize the DriverService used by all the tests.
         /// </summary>
         [OneTimeSetUp]
         public void NUnitBaseClassInit()
         {
-            SeleniumContext.StartTestRun(TestContext.CurrentContext.TestDirectory);
+            SeleniumContext.StartTestRun(MappedContext.TestBinariesDirectory);
         }
 
         /// <summary>
@@ -49,7 +51,7 @@ namespace Test.Automation.Selenium.NUnit
         [OneTimeTearDown]
         public void NUnitBaseClassCleanup()
         {
-            SeleniumContext.StopTestRun(TestContext.CurrentContext.TestDirectory);
+            SeleniumContext.StopTestRun(MappedContext.TestBinariesDirectory);
         }
 
         /// <summary>
@@ -67,19 +69,7 @@ namespace Test.Automation.Selenium.NUnit
         [TearDown]
         public void NUnitBaseTestCleanup()
         {
-            SeleniumContext.StopTest(GetTestData());
-        }
-
-        /// <summary>
-        /// Maps NUnit TestContext data to a test framework agnostic test data object.
-        /// </summary>
-        /// <returns>The populated TestData object.</returns>
-        private static TestData GetTestData()
-        {
-            var testContext = new NUnitTestContext(TestContext.CurrentContext);
-            var testAttributes = new TestAttributes(TestContext.CurrentContext.Test.Properties);
-
-            return new TestData(testContext, testAttributes);
+            SeleniumContext.StopTest(MappedContext);
         }
     }
 }
