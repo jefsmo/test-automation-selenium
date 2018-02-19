@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Test.Automation.Selenium</id>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
     <title>Test.Automation.Selenium</title>
     <authors>jefsmo</authors>
     <owners>jefsmo</owners>
@@ -26,10 +26,10 @@
       <group targetFramework="net461">
         <dependency id="NUnit" version="3.9.0" />
         <dependency id="NUnit3TestAdapter" version="3.9.0" />
-        <dependency id="Selenium.WebDriver" version="3.7.0" />
-        <dependency id="Selenium.Support" version="3.7.0" />
-        <dependency id="Shouldly" version="2.8.3" />
-        <dependency id="Test.Automation.ChromeDriver" version="2.33.0" />
+        <dependency id="Selenium.WebDriver" version="3.9.1" />
+        <dependency id="Selenium.Support" version="3.9.1" />
+        <dependency id="Test.Automation.ChromeDriver" version="2.35.0" />
+        <dependency id="Test.Automation.Base" version="1.0.3" />
       </group>
     </dependencies>
   </metadata>

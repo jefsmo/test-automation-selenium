@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.Configuration;
 using System.Globalization;
-using Test.Automation.Selenium.Enums;
 
 namespace Test.Automation.Selenium.Settings
 {

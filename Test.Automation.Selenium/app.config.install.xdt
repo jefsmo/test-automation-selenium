@@ -26,7 +26,7 @@
 
   <connectionStrings xdt:Transform="InsertIfMissing">
     <clear />
-    <add name="TEST" />
+    <add name="TEST" providerName="System.Data.SqlClient" connectionString="Data Source=MySqlServer;Integrated Security=SSPI;" />
     <add name="LOCAL" providerName="System.Data.SqlClient" connectionString="Data Source=MySqlServer;Integrated Security=SSPI;" />
   </connectionStrings>
 

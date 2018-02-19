@@ -1,8 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Configuration;
 using System.Drawing;
-using System.Runtime.CompilerServices;
-using Test.Automation.Selenium.Enums;
 // ReSharper disable ClassNeverInstantiated.Global
 
 namespace Test.Automation.Selenium.Settings

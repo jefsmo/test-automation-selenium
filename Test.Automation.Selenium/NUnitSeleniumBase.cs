@@ -6,10 +6,11 @@ using System.IO;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Text;
+using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Remote;
 using Test.Automation.Base;
-using Test.Automation.Selenium.Enums;
-using Test.Automation.Selenium.Factories;
 using Test.Automation.Selenium.Settings;
 
 namespace Test.Automation.Selenium
@@ -18,48 +19,43 @@ namespace Test.Automation.Selenium
     /// Represents an instance of the SeleniumContext class. 
     /// This class contains the methods used to create a Selenium WebDriver for testing.
     /// </summary>
-    public sealed class SeleniumContext
+    public abstract class NUnitSeleniumBase : NUnitTestBase
     {
         private DriverService DriverService { get; set; }
 
         /// <summary>
         /// The WebDriver instance created for each test.
         /// </summary>
-        public IWebDriver Driver { get; set; }
-
-        /// <summary>
-        /// The screenshot taken on test failure or when debugging.
-        /// Screenshots are saved to the test output.
-        /// </summary>
-        public string Screenshot { get; private set; }
+        protected RemoteWebDriver Driver { get; set; }
 
         #region APP CONFIG SETTINGS
-        private string TestRunSetting
+        private static string TestRunSetting
             => ConfigurationManager.AppSettings["testRunSetting"];
 
         /// <summary>
         /// BrowserSettings section data from App.config.
         /// </summary>
-        private BrowserSettings BrowserSettings 
+        private static BrowserSettings BrowserSettings 
             => ConfigurationManager.GetSection("browserSettings/" + TestRunSetting) as BrowserSettings;
 
         /// <summary>
         /// EnvironmentSettings section data from App.config.
         /// </summary>
-        public EnvironmentSettings EnvironmentSettings
+        protected static EnvironmentSettings Settings
             => ConfigurationManager.GetSection("environmentSettings/" + TestRunSetting) as EnvironmentSettings;
         #endregion
-        
+
         #region TEST ATTRIBUTED METHODS
 
         /// <summary>
         /// Initializes a single DriverService used by all the tests.
         /// </summary>
         /// <param name="binariesDir">The directory that contains the binaries used by the test when the test is run.</param>
-        public void StartTestRun(string binariesDir)
+        [OneTimeSetUp]
+        public void StartTestRun()
         {
             // Only a single Service instance is started for the entire test run.
-            DriverService = DriverServiceFactory.CreateDriverService(BrowserSettings, binariesDir);
+            DriverService = WebDriverFactory.CreateDriverService(BrowserSettings, TestContext.CurrentContext.TestDirectory);
             DriverService.Start();
         }
 
@@ -67,16 +63,21 @@ namespace Test.Automation.Selenium
         /// Closes the DriverService and deletes DriverService logs.
         /// </summary>
         /// <param name="binariesDir">The directory that contains the binaries used by the test when the test is run.</param>
-        public  void StopTestRun(string binariesDir)
+        [OneTimeTearDown]
+        public void StopTestRun()
         {
             DriverService.Dispose();
 
             // Delete the log created by the DriverService in the binaries directory, it has been copied to the logs directory.
-            ////var logs = Directory.GetFiles(".", "*.log");    // VsTest
-            ////var logs = Directory.GetFiles(TestContext.CurrentContext.TestDirectory, "*.log"); //NUnit
+            //var logs = Directory.GetFiles(".", "*.log");    // VsTest
+            //var logs = Directory.GetFiles(TestContext.CurrentContext.TestDirectory, "*.log"); //NUnit
 
-            var logs = Directory.GetFiles(binariesDir, "*.log");          
-            if (logs.Length.Equals(0)) return;
+            var logs = Directory.GetFiles(TestContext.CurrentContext.TestDirectory, "*.log");
+
+            if (logs.Length.Equals(0))
+            {
+                return;
+            }
 
             foreach (var log in logs)
             {
@@ -95,6 +96,7 @@ namespace Test.Automation.Selenium
         /// Creates a new instance of the WebDriver for each test.
         /// Applies WebDriver settings from App.config.
         /// </summary>
+        [SetUp]
         public void StartTest()
         {
             Driver = WebDriverFactory.CreateWebDriver(BrowserSettings, DriverService);
@@ -106,27 +108,27 @@ namespace Test.Automation.Selenium
         /// Closes the WebDriver instance and logs test information if the test fails or is run in debug mode.
         /// </summary>
         /// <param name="testAutomationContext">The current test data from the test framework test context.</param>
-        public void StopTest(ITestAutomationContext testAutomationContext)
+        [TearDown]
+        public void StopTest()
         {
             // Log only if test status is not 'Passed' or if debugger is attached.
-            if (!testAutomationContext.TestResultStatus.Equals(TestResultStatus.Pass) || Debugger.IsAttached)
+            if (!TestContext.CurrentContext.Result.Outcome.Status.Equals(TestStatus.Passed) || Debugger.IsAttached)
             {
                 // Always log screenshot and test data if test fails or test is run in debug mode.
-                //TestAutomationBase.LogTestAttributes(testAutomationContext);
-                //TestAutomationBase.LogTestContext(testAutomationContext);
-                LogTestEnvironment(testAutomationContext);
-                LogWebDriverServiceState(testAutomationContext);
-                LogWebDriverBrowserState(testAutomationContext);
-                Screenshot = LogScreenshot(testAutomationContext);
+                LogTestEnvironment();
+                LogWebDriverServiceState();
+                LogWebDriverBrowserState();
+                TakeScreenshot();
 
                 // Only save WebDriver logs when test is run in debug mode.
                 if (Debugger.IsAttached)
                 {
-                    LogPageSource(testAutomationContext);
-                    LogWebDriverLogs(testAutomationContext);
-                    LogDriverServiceLog(testAutomationContext);
+                    LogPageSource();
+                    LogWebDriverLogs();
+                    LogDriverServiceLog();
                 }
             }
+
             Driver.Quit();
         }
 
@@ -134,18 +136,18 @@ namespace Test.Automation.Selenium
 
         #region PRIVATE METHODS
 
-        private void LogTestEnvironment(ITestAutomationContext genericTestContext)
+        private void LogTestEnvironment()
         {
             // Log test evironment info.
             var environment = new Dictionary<string, string>
             {
                 {"Run Environment", TestRunSetting.ToUpper()},
-                {"Base URI", EnvironmentSettings.BaseUri.AbsoluteUri}
+                {"Base URI", Settings.BaseUri.AbsoluteUri}
             };
-            NUnitTestBase.WriteLogToOutput("Environment Settings", environment);
+            WriteLogToOutput("Environment Settings", environment);
         }
 
-        private void LogWebDriverServiceState(ITestAutomationContext genericTestContext)
+        private void LogWebDriverServiceState()
         {
             var webDriver = new Dictionary<string, string>
             {
@@ -156,10 +158,10 @@ namespace Test.Automation.Selenium
                 {"Service Port", DriverService.Port.ToString()},
                 {"Process ID", DriverService.ProcessId.ToString()}
             };
-            NUnitTestBase.WriteLogToOutput("WebDriver Service Settings", webDriver);
+            WriteLogToOutput("WebDriver Service Settings", webDriver);
         }
 
-        private void LogWebDriverBrowserState(ITestAutomationContext genericTestContext)
+        private void LogWebDriverBrowserState()
         {
 
             var browser = new Dictionary<string, string>
@@ -174,7 +176,7 @@ namespace Test.Automation.Selenium
                 browser.Add("Browser Size", BrowserSettings.Size.ToString());
                 browser.Add("Browser Position", BrowserSettings.Position.ToString());
             }
-            NUnitTestBase.WriteLogToOutput("WebDriver Browser Settings", browser);
+            WriteLogToOutput("WebDriver Browser Settings", browser);
             
             if (Driver == null) return;
 
@@ -184,12 +186,15 @@ namespace Test.Automation.Selenium
                 {"Browser URL", Driver.Url},
                 {"Browser Title", Driver.Title}
             };
-            NUnitTestBase.WriteLogToOutput("Browser State", browserState);
+            WriteLogToOutput("Browser State", browserState);
         }
 
-        private void LogWebDriverLogs(ITestAutomationContext genericTestContext)
+        private void LogWebDriverLogs()
         {
-            if (Driver == null) return;
+            if (Driver == null)
+            {
+                return;
+            }
 
             var logTypes = default(IEnumerable<string>);
 
@@ -204,13 +209,16 @@ namespace Test.Automation.Selenium
                 Console.WriteLine(wdEx);
             }
 
-            if (logTypes == null) return;
+            if (logTypes == null)
+            {
+                return;
+            }
 
             foreach (var logType in logTypes)
             {
-                var logName = genericTestContext.SafeTestName + "." + logType.ToUpper() +  (logType == "har" ? ".har" : ".md");
+                var logName = RemoveInvalidFileNameChars(TestContext.CurrentContext.Test.Name) + "." + logType.ToUpper() +  (logType == "har" ? ".har" : ".md");
 
-                var logPath = Path.Combine(genericTestContext.LogDirectory, logName);
+                var logPath = Path.Combine(TestContext.CurrentContext.TestDirectory, logName);
                 SaveLogType(logType, logPath);
             }
         }
@@ -227,103 +235,86 @@ namespace Test.Automation.Selenium
 
             if (sb.Length < 1) return;
 
-            Console.WriteLine($"Saving log type '{logType.ToUpper()}'");
+            //Console.WriteLine($"Saving log type '{logType.ToUpper()}'");
 
             File.WriteAllText(logPath, sb.ToString());
-            WriteFilePathToTestOutput(logPath);
+            AttachFileToOutputWindow(logPath);
         }
 
-        private void LogDriverServiceLog(ITestAutomationContext genericTestContext)
+        private void LogDriverServiceLog()
         {
             switch (BrowserSettings.Name)
             {
                 case DriverType.Chrome:
-                    RenameServiceLog(genericTestContext, "chromedriver");
+                    RenameServiceLog("chromedriver");
                     break;
                 case DriverType.Ie:
-                    RenameServiceLog(genericTestContext, "IEDriverServer");
+                    RenameServiceLog("IEDriverServer");
                     break;
                 case DriverType.PhantomJs:
-                    RenameServiceLog(genericTestContext, "phantomjsdriver");
+                    RenameServiceLog("phantomjsdriver");
                     break;
                 case DriverType.Edge:
-                    RenameServiceLog(genericTestContext, "Edge");
+                    RenameServiceLog("Edge");
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(BrowserSettings.Name), (int)BrowserSettings.Name, null);
             }
         }
 
-        private void RenameServiceLog(ITestAutomationContext genericTestContext, string browserName)
+        private void RenameServiceLog(string browserName)
         {
             var sourceName = browserName + ".log";
-            var destName = genericTestContext.SafeTestName + "." + browserName.ToUpper() + ".md";
-            var source = Path.Combine(genericTestContext.TestBinariesDirectory, sourceName);
-            var dest = Path.Combine(genericTestContext.LogDirectory, destName);
+            var destName = RemoveInvalidFileNameChars(TestContext.CurrentContext.Test.Name) + "." + browserName.ToUpper() + ".md";
+            var sourcePath = Path.Combine(TestContext.CurrentContext.TestDirectory, sourceName);
+            var destPath = Path.Combine(TestContext.CurrentContext.TestDirectory, destName);
 
-            if (!File.Exists(source)) return;
+            if (!File.Exists(sourcePath))
+            {
+                return;
+            }
 
             try
             {
-                File.Copy(source, dest, true);
+                File.Copy(sourcePath, destPath, true);
             }
             catch (IOException ioEx)
             {
                 Console.WriteLine(ioEx);
             }
 
-            WriteFilePathToTestOutput(dest);
+            AttachFileToOutputWindow(destPath);
         }
 
-        private string LogScreenshot(ITestAutomationContext genericTestContext)
+        private void TakeScreenshot()
         {
-            if (Driver == null) return null;
+            if (Driver is null)
+            {
+                return;
+            }
 
-            var ssFileName = genericTestContext.SafeTestName + ".png";
-            var ssFilePath = Path.Combine(genericTestContext.LogDirectory, ssFileName);
+            var ssFileName = RemoveInvalidFileNameChars(TestContext.CurrentContext.Test.Name) + ".png";
+            var ssFilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, ssFileName);
 
             // Take a screenshot.
-            var ss = ((ITakesScreenshot)Driver).GetScreenshot();
+            var ss = Driver.GetScreenshot();
 
             if (string.IsNullOrEmpty(ss.ToString()))
             {
                 Console.WriteLine(
                     "Screenshot Not Taken: A webpage error may be preventing the screenshot from being taken.\r\n" +
                     "Repro the test manually to identify the webpage error.");
-                return null;
             }
 
-            var ssFile = SaveScreenshot(ss, ssFilePath);
-            WriteFilePathToTestOutput(ssFile);
-            return ssFile;
+            SaveScreenshot(ss, ssFilePath);
         }
 
-        private void LogPageSource(ITestAutomationContext genericTestContext)
-        {
-            if (Driver == null) return;
-
-            var psFileName = genericTestContext.SafeTestName + ".html";
-            var psFilePath = Path.Combine(genericTestContext.LogDirectory, psFileName);
-
-            // Get page source.
-            var ps = Driver.PageSource;
-
-            if (string.IsNullOrEmpty(ps))
-            {
-                Console.WriteLine("PageSource Not Available: The WebDriver did not contain any PageSource data.");
-                return;
-            }
-
-            var psFile = SavePageSource(ps, psFilePath);
-            WriteFilePathToTestOutput(psFile);
-        }
-
-        private static string SaveScreenshot(Screenshot screenshot, string file)
+        private static void SaveScreenshot(Screenshot screenshot, string screenshotFile)
         {
             // Save the screenshot to a file, overwriting the file if it already exits.
             try
             {
-                screenshot.SaveAsFile(file, ScreenshotImageFormat.Png);
+                screenshot.SaveAsFile(screenshotFile, ScreenshotImageFormat.Png);
             }
             catch (System.Runtime.InteropServices.ExternalException ex)
             {
@@ -331,15 +322,39 @@ namespace Test.Automation.Selenium
                 Console.WriteLine(ex);
             }
 
-            return file;
+            AttachFileToOutputWindow(screenshotFile);
         }
 
-        private static string SavePageSource(string pageSource, string file)
+        private void LogPageSource()
+        {
+            var pageSourceData = string.Empty;
+
+            if (Driver == null)
+            {
+                return;
+            }
+
+            // Get page source.
+            pageSourceData = Driver.PageSource;
+
+            if (string.IsNullOrEmpty(pageSourceData))
+            {
+                Console.WriteLine("PageSource Not Available: The WebDriver did not contain any PageSource data.");
+                return;
+            }
+
+            var psFileName = RemoveInvalidFileNameChars(TestContext.CurrentContext.Test.Name) + ".html";
+            var psFilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, psFileName);
+
+            SavePageSource(pageSourceData, psFilePath);
+        }
+
+        private static void SavePageSource(string pageSourceData, string pageSourceFile)
         {
             try
             {
                 // Save the page source to a file, if the target file already exists, it is overwritten.
-                File.WriteAllText(file, pageSource, Encoding.UTF8);
+                File.WriteAllText(pageSourceFile, pageSourceData, Encoding.UTF8);
             }
             catch (Exception ex)
             {
@@ -347,7 +362,7 @@ namespace Test.Automation.Selenium
                 Console.WriteLine(ex);
             }
 
-            return file;
+            AttachFileToOutputWindow(pageSourceFile);
         }
 
         private void SetBrowserWindow()
@@ -370,6 +385,15 @@ namespace Test.Automation.Selenium
                     Driver.Manage().Window.Size = BrowserSettings.Size;
                 }
             }
+        }
+
+        /// <summary>
+        /// Attaches the file to the Visual Studio output window in the Attachments section.
+        /// </summary>
+        /// <param name="fileToAttach">The full path and file name of the file to attach.</param>
+        private static void AttachFileToOutputWindow(string fileToAttach)
+        {
+            TestContext.AddTestAttachment(fileToAttach);
         }
 
         private static void WriteFilePathToTestOutput(string file)

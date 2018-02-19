@@ -2,10 +2,10 @@
 **README.md**
 
 ## History
-|Date|Notes|
-|---|---|
-|2018-02-17|Bug fixes|
-|2017-12-05|Initial Release|
+|Version|Date|Notes|
+|---|---|---|
+|1.1.0|2018-02-19|Bug fixes|
+|1.0.0|2017-12-05|Initial Release|
 
 The Test.Automation.* projects create NuGet packages for test automation.  
 The NuGet packages can be generated locally to a packages folder on your hard drive.  

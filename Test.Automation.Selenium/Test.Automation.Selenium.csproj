@@ -46,8 +46,8 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
-    <Reference Include="Test.Automation.Base, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Test.Automation.Base.1.0.1.0\lib\net461\Test.Automation.Base.dll</HintPath>
+    <Reference Include="Test.Automation.Base, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Test.Automation.Base.1.0.3\lib\net461\Test.Automation.Base.dll</HintPath>
     </Reference>
     <Reference Include="WebDriver, Version=3.9.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Selenium.WebDriver.3.9.1\lib\net45\WebDriver.dll</HintPath>
@@ -57,19 +57,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Enums\DriverType.cs" />
-    <Compile Include="Enums\ToDescriptionExtension.cs" />
-    <Compile Include="Factories\DriverServiceFactory.cs" />
-    <Compile Include="Factories\PageFactoryBase.cs" />
-    <Compile Include="Factories\WebDriverFactory.cs" />
-    <Compile Include="NUnit\NUnitSeleniumBase.cs" />
+    <Compile Include="DriverType.cs" />
+    <Compile Include="PageFactoryBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SeleniumContext.cs" />
+    <Compile Include="NUnitSeleniumBase.cs" />
     <Compile Include="Settings\BrowserSettings.cs" />
     <Compile Include="Settings\DriverTypeConverter.cs" />
     <Compile Include="Settings\EnvironmentSettings.cs" />
     <Compile Include="Settings\PointConverter.cs" />
     <Compile Include="Settings\SizeConverter.cs" />
+    <Compile Include="ToDescriptionExtension.cs" />
+    <Compile Include="WebDriverFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config.install.xdt" />
@@ -79,10 +77,6 @@
     <None Include="Test.Automation.Selenium.nuspec" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\packages\Test.Automation.ChromeDriver.2.35.0.0\content\chromedriver.exe">
-      <Link>chromedriver.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="selenium-logo.png" />
   </ItemGroup>
   <ItemGroup>

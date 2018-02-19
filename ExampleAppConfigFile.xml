@@ -17,7 +17,7 @@
     testRunSetting = Choose a test environment. [ LOCAL | TEST | < ... > ]
     ===========================================================================
     -->
-    <add key="testRunSetting" value="TEST" />
+    <add key="testRunSetting" value="LOCAL" />
   </appSettings>
 
   <connectionStrings>
@@ -48,8 +48,8 @@
     IsHeadless              =  Run the Chrome browser in a headless environment  (Chrome only)[ true | *false] 
     ===========================================================================
     -->
-    <LOCAL Name="Chrome" />
-    <TEST Name="Chrome" IsMaximized="true"  />
+    <LOCAL Name="Chrome" Size="800, 600" HideCommandPromptWindow="false" />
+    <TEST Name="Chrome" IsMaximized="true" HideCommandPromptWindow="true" />
   </browserSettings>
 
 </configuration>

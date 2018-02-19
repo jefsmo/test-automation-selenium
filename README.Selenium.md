@@ -90,9 +90,10 @@ namespace UnitTestProject1
     }
 }
 ```
-### Debug Mode Output
-![BingTitle_ShouldBeBing.png](./BingTitle_ShouldBeBing.png)
 
+```
+
+```
 
 ## Example App Config File
 An App.config file should be installed by the Test.Automation.Selenium package.  
@@ -118,13 +119,13 @@ You can use this file as a reference if the original file is deleted or broken.
     testRunSetting = Choose a test environment. [ LOCAL | TEST | < ... > ]
     ===========================================================================
     -->
-    <add key="testRunSetting" value="TEST" />
+    <add key="testRunSetting" value="LOCAL" />
   </appSettings>
 
   <connectionStrings>
     <clear />
-    <add name="LOCAL" providerName="System.Data.SqlClient" connectionString="Data Source=MyLocalSqlServer;" />
-    <add name="TEST" providerName="System.Data.SqlClient" connectionString="Data Source=MyLocalSqlServer;" />
+    <add name="LOCAL" providerName="System.Data.SqlClient" connectionString="Data Source=localhost;" />
+    <add name="TEST" providerName="System.Data.SqlClient" connectionString="Data Source=localhost;" />
   </connectionStrings>
 
   <environmentSettings>
@@ -149,8 +150,8 @@ You can use this file as a reference if the original file is deleted or broken.
     IsHeadless              =  Run the Chrome browser in a headless environment  (Chrome only)[ true | *false] 
     ===========================================================================
     -->
-    <LOCAL Name="Chrome" />
-    <TEST Name="Chrome"  />
+    <LOCAL Name="Chrome" Size="800, 600" HideCommandPromptWindow="false" />
+    <TEST Name="Chrome" IsMaximized="true" HideCommandPromptWindow="true" />
   </browserSettings>
 
 </configuration>

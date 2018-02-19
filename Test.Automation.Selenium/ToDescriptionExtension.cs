@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace Test.Automation.Selenium.Enums
+namespace Test.Automation.Selenium
 {
     /// <summary>
     /// Represents an extension method to display the string in the enum DescriptionAttribute.

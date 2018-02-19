@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Test.Automation.Selenium.Enums
+namespace Test.Automation.Selenium
 {
     /// <summary>
     /// Maps browsers to  browser specific WebDrivers.

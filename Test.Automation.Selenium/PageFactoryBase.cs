@@ -5,7 +5,7 @@ using OpenQA.Selenium.Support.PageObjects;
 using OpenQA.Selenium.Support.UI;
 using Test.Automation.Selenium.Settings;
 
-namespace Test.Automation.Selenium.Factories
+namespace Test.Automation.Selenium
 {
     /// <summary>
     /// Represents an abstract page factory base class.
