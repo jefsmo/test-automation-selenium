@@ -218,8 +218,7 @@ You can use this file as a reference if the original file is deleted or broken.
 
   <connectionStrings>
     <clear />
-    <add name="LOCAL" providerName="System.Data.SqlClient" connectionString="Data Source=localhost;" />
-    <add name="TEST" providerName="System.Data.SqlClient" connectionString="Data Source=localhost;" />
+    <add name="TEST.localhost" providerName="System.Data.SqlClient" connectionString="Data Source=localhost;" />
   </connectionStrings>
 
   <environmentSettings>
@@ -227,25 +226,28 @@ You can use this file as a reference if the original file is deleted or broken.
     BaseUri = Base URI of Application Under Test (AUT).
     ===========================================================================
     -->
-    <LOCAL BaseUri="http://www.bing.com" />
-    <TEST BaseUri="http://www.bing.com" />
+    <TEST BaseUri="https://www.bing.com" />
+    <LOCAL BaseUri="https://www.bing.com" />
   </environmentSettings>
 
   <browserSettings>
     <!--
     *-Denotes default value. Settings are optional unless noted otherwise.
-    Name                    =  WebDriver browser name.                           [ *Chrome | IE | Edge ]
-    Position                =  Browser window position. (from upper left corner) [ *(10, 10) ]
-    Size                    =  Browser window size. (width, height)              [ *(1600, 900) ] 
-    IsMaximized             =  Maximize browser window. (overrides window size)  [ true | *false ]
-    HideCommandPromptWindow =  Hide WebDriver service command window.            [ *true | false ] 
-    DefaultWaitTimeout      =  Default WebDriver Wait timeout value. (seconds)   [ *3 ]
-    DownloadDefaultDir      =  Default Chrome download directory                 (Chrome only)
-    IsHeadless              =  Run the Chrome browser in a headless environment  (Chrome only)[ true | *false] 
+    Name                      WebDriver browser name.                           [ *Chrome | IE | Edge ]
+    Position                  Browser window position. (from upper left corner) [ *(10, 10) ]
+    Size                      Browser window size. (width, height)              [ *(1600, 900) ] 
+    IsMaximized               Maximize browser window. (overrides window size)  [ true | *false ]
+    HideCommandPromptWindow   Hide WebDriver service command window.            [ *true | false ] 
+    DefaultWaitTimeout        Default WebDriver Wait timeout value. (seconds)   [ *3 ]
+    DownloadDefaultDir        Default Chrome download directory                 (Chrome only)
+    IsHeadless                Run the Chrome browser in a headless environment  (Chrome only)[ true | *false] 
+    EnableVerboseLogging      Enable DriverService verbose logging.             [ true | *false ] 
+    LogLevel                  Level of logging for WebDriver instances.         [ All | Debug | Info | *Warning | Severe | Off ]
+    IntroduceInstabilityByIgnoringProtectedModeSettings Ignore IE Protected Mode settings (IE only) [ true | *false ]
     ===========================================================================
     -->
+    <TEST Name="Chrome" />
     <LOCAL Name="Chrome" />
-    <TEST Name="Chrome"  />
   </browserSettings>
 
 </configuration>
