@@ -29,14 +29,12 @@ namespace Test.Automation.Selenium
         protected RemoteWebDriver Driver { get; set; }
 
         #region APP CONFIG SETTINGS
-        private static string TestRunSetting
-            => ConfigurationManager.AppSettings["testRunSetting"];
+        private static string TestRunSetting => ConfigurationManager.AppSettings["testRunSetting"];
 
         /// <summary>
         /// BrowserSettings section data from App.config.
         /// </summary>
-        private static BrowserSettings BrowserSettings 
-            => ConfigurationManager.GetSection("browserSettings/" + TestRunSetting) as BrowserSettings;
+        private static BrowserSettings BrowserSettings => ConfigurationManager.GetSection("browserSettings/" + TestRunSetting) as BrowserSettings;
 
         /// <summary>
         /// EnvironmentSettings section data from App.config.
@@ -123,13 +121,14 @@ namespace Test.Automation.Selenium
                 // Only save WebDriver logs when test is run in debug mode.
                 if (Debugger.IsAttached)
                 {
-                    LogPageSource();
+                    //LogPageSource();
                     LogWebDriverLogs();
                     LogDriverServiceLog();
                 }
             }
 
             Driver.Quit();
+            Driver?.Dispose();
         }
 
         #endregion
@@ -198,19 +197,20 @@ namespace Test.Automation.Selenium
 
             var logTypes = default(IEnumerable<string>);
 
+            //  The IE driver does not support getting logs of any kind.
+            //  Those commands have not been implemented.
+            //  They will be implemented only when the server-side API is properly specified.
             try
             {
                 var logs = Driver.Manage().Logs;
                 logTypes = logs.AvailableLogTypes;
             }
-            catch (WebDriverException wdEx)
+            catch (NullReferenceException nullEx)
             {
-                Console.WriteLine("Logs not available for this WebDriver.");
-                Console.WriteLine(wdEx);
-            }
-
-            if (logTypes == null)
-            {
+                if (Debugger.IsAttached)
+                {
+                    Console.WriteLine($"WebDriver Logs not available for '{Driver.Capabilities.BrowserName}' WebDriver; EXCEPTION: {nullEx.Message}");
+                }
                 return;
             }
 
@@ -248,7 +248,7 @@ namespace Test.Automation.Selenium
                 case DriverType.Chrome:
                     RenameServiceLog("chromedriver");
                     break;
-                case DriverType.Ie:
+                case DriverType.IE:
                     RenameServiceLog("IEDriverServer");
                     break;
                 case DriverType.PhantomJs:
@@ -401,7 +401,6 @@ namespace Test.Automation.Selenium
             if (File.Exists(file))
             {
                 // How to create a file URI.
-                // ReSharper disable once UnusedVariable
                 var uri = new UriBuilder
                 {
                     Scheme = "file",    // The Internet access 'file' protocol.

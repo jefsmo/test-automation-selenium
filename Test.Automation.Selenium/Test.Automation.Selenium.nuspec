@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Test.Automation.Selenium</id>
-    <version>1.1.0</version>
+    <version>1.0.4</version>
     <title>Test.Automation.Selenium</title>
     <authors>jefsmo</authors>
     <owners>jefsmo</owners>
@@ -17,19 +17,19 @@
     </description>
     <releaseNotes>Initial Release (2017-02-18)
     </releaseNotes>
-    <copyright>© 2017 jefsmo</copyright>
+    <copyright>© 2017-2018 jefsmo</copyright>
     <tags>Selenium WebDriver NUnit</tags>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System.Configuration" targetFramework="net461" />
     </frameworkAssemblies>
     <dependencies>
       <group targetFramework="net461">
-        <dependency id="NUnit" version="3.9.0" />
-        <dependency id="NUnit3TestAdapter" version="3.9.0" />
-        <dependency id="Selenium.WebDriver" version="3.9.1" />
-        <dependency id="Selenium.Support" version="3.9.1" />
+        <dependency id="NUnit" version="3.10.1" />
+        <dependency id="NUnit3TestAdapter" version="3.10.0" />
+        <dependency id="Selenium.WebDriver" version="3.13.0" />
+        <dependency id="Selenium.Support" version="3.13.0" />
         <dependency id="Test.Automation.ChromeDriver" version="2.35.0" />
-        <dependency id="Test.Automation.Base" version="1.0.3" />
+        <dependency id="Test.Automation.Base" version="1.0.4" />
       </group>
     </dependencies>
   </metadata>

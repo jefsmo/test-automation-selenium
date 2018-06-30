@@ -17,7 +17,7 @@ namespace Test.Automation.Selenium
         /// IEDriverServer.
         /// </summary>
         [Description("IEDriverServer")]
-        Ie,
+        IE,
 
         /// <summary>
         /// PhantomJS.

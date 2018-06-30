@@ -1,28 +1,26 @@
 # Test.Automation.Selenium
+
 **README.Selenium.md**
+
 ## Contents
 [Verify App.config File Created](#verify-app-config-file-created)  
 [Install and Update NuGet Packages ](#install-and-update-nuget-packages)  
 [NUnit Test Framework Workflow ](#nunit-test-framework-workflow)  
-[NUnitSeleniumBase Example](#nunitseleniumbase-example)  
+[NUnitSeleniumBase Examples](#nunitseleniumbase-examples)  
 [Example App Config File](#example-app-config-file)  
 
 ## Verify App Config File Created
 This package should add an App.config file and modify it with custom configuration sections.  
-**Verify the App.config file is created.**
 
-If the App.config file is misssing, add it using Add | New Item... | General | Application Configuration File  
+If the App.config file is misssing, add it in Visual Studio using `Add | New Item... | General | Application Configuration File`  
 Copy/Paste the content from the example App.config file below.
 
 The supplied BrowserSettings work well for development (LOCAL) and running on a test machine (TEST).  
 
 Use the `<appSettings>` **"testRunSetting"** to switch between test environments easily.
-```
+
+```xml
   <appSettings>
-    <!--
-    testRunSetting = Choose a test environment. [ LOCAL | TEST | < ... >  ]
-    ===========================================================================
-    -->
     <add key="testRunSetting" value="TEST" />
   </appSettings>
 ```
@@ -31,16 +29,13 @@ Use the `<appSettings>` **"testRunSetting"** to switch between test environments
 WebDriver driver packages and Selenium are updated frequently.  
 Check for updates using the NuGet package manager in Visual Studio.  
 
-You may want to add other NuGet packages useful for WebDriver tests:    
-- **ChromeDriver** is installed with the package.
-   - At least one WebDriver package **must be installed** in your test project.
-- You may want to install other WebDrivers:
-     - **IEDriverServer** is used for Internet Explorer
-   - Ensure that the browser for your WebDriver is already installed on the machine used for testing.  
-- **Selenium.Support** is installed with the package.
-   - For creating Page Objects, Page Factory objects and WebDriverWait expected conditions.  
-- **Shouldly**  is installed with the package.
-   - For fluent test assertions.  
+You may want to add other NuGet packages useful for WebDriver tests:
+- At least one WebDriver package **must be installed** in your test project.
+  - **ChromeDriver** is installed with the package.
+  - **IEDriverServer** is used for Internet Explorer
+  - **MicrosoftWebDriver** is for Edge browser on Windows 10
+- Ensure that the browser for your WebDriver is already installed on the machine used for testing.  
+  - Chrome must be installed to use chromedriver etc.
 
 ## NUnit Test Framework Workflow
 - Create a Visual Studio Test Project using the VS test project template.
@@ -51,11 +46,11 @@ You may want to add other NuGet packages useful for WebDriver tests:
 - Add a test class to the test project.
 - Add `[TestFixture]` attribute to the test class.
 - Ensure the test class inherits from the **NUnitSeleniumBase**.
-   - `public class UnitTest1 : NUnitSeleniumBase`  
+   - **`public class UnitTest1 : NUnitSeleniumBase`** 
 - Add a test method attribute to the method.
    - Add `[Test]` attribute to make it a test method.
 - To start an instance of the WebDriver in your test, you must assign an URL.
-   - `Driver.Url = "http://www.bing.com"; `
+   - **`Driver.Url = "https://www.bing.com";`** 
    - You can configure a base URL for your tests in the App.config file
 - Edit the App.config file in your test project to customize WebDriver settings. 
 - Run your test:
@@ -64,17 +59,25 @@ You may want to add other NuGet packages useful for WebDriver tests:
     - WebDriver logs are automatically created for failed tests (and in debug mode.)
   - By default, **no output** is written for tests that pass.
 
-## NUnitSeleniumBase Example
-```
+## NUnitSeleniumBase Examples
+```csharp
+using System;
 using NUnit.Framework;
-using Shouldly;
-using Test.Automation.Selenium.NUnit;
+using Test.Automation.Base;
+using Test.Automation.Selenium;
 
 namespace UnitTestProject1
 {
     [TestFixture]
-    class TestClass : NUnitSeleniumBase
+    public class UnitTest1 : NUnitSeleniumBase
     {
+        [Test]
+        public void TestMethod1()
+        {
+            Driver.Url = "https://www.bing.com";
+            Assert.That(Driver.Title, Is.EqualTo("Bing"));
+        }
+
         [Test,
             Author("Your Name"),
             Description("Verify page title is 'Bing'."),
@@ -82,23 +85,80 @@ namespace UnitTestProject1
             Web,
             Property("Some Other Property", "foo bar"),
             Property("WorkItem", 12345)]
-        public void BingTitle_ShouldBeBing()
+        public void Bing_Title_ShouldBeBing()
         {
-            Driver.Url = Settings.BaseUri.AbsoluteUri;   // <LOCAL BaseUri="http://www.bing.com" />
-            Driver.Title.ShouldBe("Bing", "Page title does not match expected value.");
+            Driver.Url = Settings.BaseUri.AbsoluteUri; 
+            Assert.That(Driver.Title, Is.EqualTo("Bing"), "Page title does not match expected value.");
         }
     }
 }
 ```
-### Debug Mode Output
-![BingTitle_ShouldBeBing.png](./BingTitle_ShouldBeBing.png)
 
+## Example Test Output - Run
+
+~~~text
+Test Name:	Bing_Title_ShouldBeBing
+Test FullName:	UnitTestProject1.UnitTest1.Bing_Title_ShouldBeBing
+Test Source:	C:\Source\Repos\test-automation-selenium\UnitTestProject1\UnitTest1.cs : line 25
+Test Outcome:	Passed
+Test Duration:	0:00:05.745
+~~~
+
+## Example Test Output - Debug
+```text
+Test Name:	Bing_Title_ShouldBeBing
+Test Outcome:	Passed
+Result StandardOutput:	
+ENVIRONMENT SETTINGS
+Run Environment          	TEST                          
+Base URI                 	https://www.bing.com/         
+================================================================================
+WEBDRIVER SERVICE SETTINGS
+Service Name             	OpenQA.Selenium.IE.InternetExplorerDriverService
+Service State            	RUNNING                       
+Service Window           	HIDDEN                        
+Service URI              	http://localhost:5555/        
+Service Port             	5555                          
+Process ID               	10748                         
+================================================================================
+WEBDRIVER BROWSER SETTINGS
+Browser Name             	IE                            
+Browser Window           	NORMAL                        
+Browser Mode             	NORMAL                        
+Browser Size             	{Width=800, Height=600}       
+Browser Position         	{X=10,Y=10}                   
+================================================================================
+BROWSER STATE
+Browser Caps             	Capabilities [BrowserName=internet explorer, Platform=Any, Version=]
+Browser URL              	https://www.bing.com/         
+Browser Title            	Bing                          
+================================================================================
+WebDriver Logs not available for 'internet explorer' WebDriver; EXCEPTION: Object reference not set to an instance of an object.
+TEST ATTRIBUTES
+Owner                    	Your Name                     
+Description              	Verify page title is 'Bing'.  
+Timeout                  	Infinite                      
+Test Priority            	Unknown                       
+Test Category            	Web                           
+Test Property            	[Some Other Property, foo bar]
+Work Item                	12345                         
+================================================================================
+TEST CONTEXT
+Unique ID                	0-1002                        
+Class Name               	UnitTestProject1.UnitTest1    
+Method Name              	Bing_Title_ShouldBeBing       
+Test Name                	Bing_Title_ShouldBeBing       
+Binaries Dir             	C:\Source\Repos\test-automation-selenium\UnitTestProject1\bin\Debug
+Deployment Dir           	C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE
+Logs Dir                 	C:\Source\Repos\test-automation-selenium\UnitTestProject1\bin\Debug
+================================================================================
+```
 
 ## Example App Config File
-An App.config file should be installed by the Test.Automation.Selenium package.  
-You can use this file as a reference if the original file is deleted or broken.  
+- An App.config file should be installed by the Test.Automation.Selenium package.  
+- You can use this file as a reference if the original file is deleted or broken.  
 
-```
+```xml
 <?xml version="1.0" encoding="utf-8" ?>
 <configuration>
 
@@ -123,8 +183,7 @@ You can use this file as a reference if the original file is deleted or broken.
 
   <connectionStrings>
     <clear />
-    <add name="LOCAL" providerName="System.Data.SqlClient" connectionString="Data Source=MyLocalSqlServer;" />
-    <add name="TEST" providerName="System.Data.SqlClient" connectionString="Data Source=MyLocalSqlServer;" />
+    <add name="TEST.localhost" providerName="System.Data.SqlClient" connectionString="Data Source=localhost;" />
   </connectionStrings>
 
   <environmentSettings>
@@ -132,27 +191,29 @@ You can use this file as a reference if the original file is deleted or broken.
     BaseUri = Base URI of Application Under Test (AUT).
     ===========================================================================
     -->
-    <LOCAL BaseUri="http://www.bing.com" />
-    <TEST BaseUri="http://www.bing.com" />
+    <TEST BaseUri="https://www.bing.com" />
+    <LOCAL BaseUri="https://www.bing.com" />
   </environmentSettings>
 
   <browserSettings>
     <!--
     *-Denotes default value. Settings are optional unless noted otherwise.
-    Name                    =  WebDriver browser name.                           [ *Chrome | IE | Edge ]
-    Position                =  Browser window position. (from upper left corner) [ *(10, 10) ]
-    Size                    =  Browser window size. (width, height)              [ *(1600, 900) ] 
-    IsMaximized             =  Maximize browser window. (overrides window size)  [ true | *false ]
-    HideCommandPromptWindow =  Hide WebDriver service command window.            [ *true | false ] 
-    DefaultWaitTimeout      =  Default WebDriver Wait timeout value. (seconds)   [ *3 ]
-    DownloadDefaultDir      =  Default Chrome download directory                 (Chrome only)
-    IsHeadless              =  Run the Chrome browser in a headless environment  (Chrome only)[ true | *false] 
+    Name                      WebDriver browser name.                           [ *Chrome | IE | Edge ]
+    Position                  Browser window position. (from upper left corner) [ *(10, 10) ]
+    Size                      Browser window size. (width, height)              [ *(1600, 900) ] 
+    IsMaximized               Maximize browser window. (overrides window size)  [ true | *false ]
+    HideCommandPromptWindow   Hide WebDriver service command window.            [ *true | false ] 
+    DefaultWaitTimeout        Default WebDriver Wait timeout value. (seconds)   [ *3 ]
+    DownloadDefaultDir        Default Chrome download directory                 (Chrome only)
+    IsHeadless                Run the Chrome browser in a headless environment  (Chrome only)[ true | *false] 
+    EnableVerboseLogging      Enable DriverService verbose logging.             [ true | *false ] 
+    LogLevel                  Level of logging for WebDriver instances.         [ All | Debug | Info | *Warning | Severe | Off ]
+    IntroduceInstabilityByIgnoringProtectedModeSettings Ignore IE Protected Mode settings (IE only) [ true | *false ]
     ===========================================================================
     -->
-    <LOCAL Name="Chrome" />
     <TEST Name="Chrome"  />
+    <LOCAL Name="Chrome" />
   </browserSettings>
 
 </configuration>
-
 ```  

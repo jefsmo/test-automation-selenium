@@ -5,9 +5,9 @@ VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8D908A4B-B44C-46BB-8DEB-CA0757E78D25}"
 	ProjectSection(SolutionItems) = preProject
-		ExampleAppConfigFile.xml = ExampleAppConfigFile.xml
+		App.config = App.config
+		OBSOLETE_PageFactoryBase.cs = OBSOLETE_PageFactoryBase.cs
 		README.md = README.md
-		README.Selenium.md = README.Selenium.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Automation.Selenium", "Test.Automation.Selenium\Test.Automation.Selenium.csproj", "{C02C8629-25A8-4B64-8BB6-D801470606D6}"

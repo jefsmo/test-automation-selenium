@@ -41,12 +41,9 @@ namespace Test.Automation.Selenium
                 case DriverType.Chrome:
                     KillWebDriverProcess("chromedriver");
                     return CreateChromeDriverService(browserSettings, binariesPath);
-                case DriverType.Ie:
+                case DriverType.IE:
                     KillWebDriverProcess("IEDriverServer");
                     return CreateIeDriverService(browserSettings, binariesPath);
-                case DriverType.PhantomJs:
-                    KillWebDriverProcess("phantomjs");
-                    return CreatePhantomJsDriverService(browserSettings, binariesPath);
                 case DriverType.Edge:
                     KillWebDriverProcess("MicrosoftWebDriver");
                     return CreateEdgeDriverService(browserSettings, binariesPath);
@@ -69,27 +66,26 @@ namespace Test.Automation.Selenium
             {
                 case DriverType.Chrome:
                     return CreateChromeDriver(driverservice, browserSettings);
-                case DriverType.Ie:
-                    return CreateIeDriver(driverservice);
-                case DriverType.PhantomJs:
-                    return CreatePhantomDriver(driverservice);
+                case DriverType.IE:
+                    return CreateIeDriver(driverservice, browserSettings);
                 case DriverType.Edge:
-                    return CreateMicrosoftWebDriver(driverservice);
+                    return CreateMicrosoftWebDriver(driverservice, browserSettings);
                 default:
                     Console.WriteLine("Support for this browser's WebDriver has not been added to the base class. Update the base class to use this WebDriver.");
                     throw new ArgumentOutOfRangeException(nameof(browserSettings.Name), (int)browserSettings.Name, "Invalid browser name.");
             }
         }
 
-        private static RemoteWebDriver CreateMicrosoftWebDriver(DriverService service)
+        #region PRIVATE METHODS
+        private static RemoteWebDriver CreateMicrosoftWebDriver(DriverService service, BrowserSettings browserSettings)
         {
             var edgeOptions = new EdgeOptions
             {
                 PageLoadStrategy = PageLoadStrategy.Normal
             };
 
-            edgeOptions.SetLoggingPreference(LogType.Driver, LogLevel.Warning);
-            edgeOptions.SetLoggingPreference(LogType.Browser, LogLevel.Warning);
+            edgeOptions.SetLoggingPreference(LogType.Driver, browserSettings.LogLevel);
+            edgeOptions.SetLoggingPreference(LogType.Browser, browserSettings.LogLevel);
 
             try
             {
@@ -103,7 +99,7 @@ namespace Test.Automation.Selenium
             }
         }
 
-        private static RemoteWebDriver CreateChromeDriver(DriverService service, BrowserSettings browser)
+        private static RemoteWebDriver CreateChromeDriver(DriverService service, BrowserSettings browserSettings)
         {
             // CAUTION: Using the "no-sandbox" option leaves 2 chrome processes open after calling Driver.Quit();
             //          It appears that "no-sandbox" is no longer required for running in Visual Studio.
@@ -112,7 +108,7 @@ namespace Test.Automation.Selenium
                 "disable-plugins", "disable-plugins-discovery", "disable-extensions"
             };
 
-            if (browser.IsHeadless)
+            if (browserSettings.IsHeadless)
             {
                 args.AddRange(new List<string>{
                     "headless",
@@ -120,27 +116,27 @@ namespace Test.Automation.Selenium
                 });
             }
 
-            if (browser.IsMaximized)
+            if (browserSettings.IsMaximized)
             {
                 args.Add("start-maximized");
             }
             else
             {
-                args.Add($"window-position={browser.Position.X},{browser.Position.Y}");
-                args.Add($"window-size={browser.Size.Width},{browser.Size.Height}");
+                args.Add($"window-position={browserSettings.Position.X},{browserSettings.Position.Y}");
+                args.Add($"window-size={browserSettings.Size.Width},{browserSettings.Size.Height}");
             }
 
             var chromeOptions = new ChromeOptions();
             chromeOptions.AddArguments(args);
 
-            if (!string.IsNullOrEmpty(browser.DownloadDefaultDir))
+            if (!string.IsNullOrEmpty(browserSettings.DownloadDefaultDir))
             {
-                chromeOptions.AddUserProfilePreference("download.default_directory", $"{browser.DownloadDefaultDir}");
+                chromeOptions.AddUserProfilePreference("download.default_directory", $"{browserSettings.DownloadDefaultDir}");
             }
 
             // Chrome supports DRIVER and BROWSER.
-            chromeOptions.SetLoggingPreference(LogType.Driver, LogLevel.Warning);
-            chromeOptions.SetLoggingPreference(LogType.Browser, LogLevel.Warning);
+            chromeOptions.SetLoggingPreference(LogType.Driver, browserSettings.LogLevel);
+            chromeOptions.SetLoggingPreference(LogType.Browser, browserSettings.LogLevel);
 
             try
             {
@@ -154,60 +150,39 @@ namespace Test.Automation.Selenium
             }
         }
 
-        private static RemoteWebDriver CreateIeDriver(DriverService service)
+        private static RemoteWebDriver CreateIeDriver(DriverService service, BrowserSettings browserSettings)
         {
             var ieOptions = new InternetExplorerOptions
             {
                 EnsureCleanSession = true,
                 IgnoreZoomLevel = true,
+                PageLoadStrategy = PageLoadStrategy.Normal,
+                // IE requires 'Enable Protected Mode' security setting to be the same for all zones.
+                // This setting is a workaround for that requirement.
+                IntroduceInstabilityByIgnoringProtectedModeSettings = browserSettings.IntroduceInstabilityByIgnoringProtectedModeSettings
             };
 
-            ieOptions.SetLoggingPreference(LogType.Driver, LogLevel.Warning);
-            ieOptions.SetLoggingPreference(LogType.Browser, LogLevel.Warning);
+            // IEDriverServer log JSON:
+            //"timeouts" : 
+			//{
+            //    "implicit" : 0,
+			//	  "pageLoad" : 300000,
+			//	  "script" : 0
+            //}
+            // Time (in ms) that time-limited commands are permitted to run.
+            // Default = 0 ms means no  time limit.
+            // Valid values are: "script" for script timeouts, "implicit" for modifying the implicit wait timeout and "page load" for setting a page load timeout.
+            ieOptions.AddAdditionalCapability(CapabilityType.Timeouts, new { @implicit = 0, pageLoad = 300000, script = 0 }, true);
+
+            //  The IE driver does not support getting logs of any kind.
+            //  Those commands have not been implemented.
+            //  They will be implemented only when the server-side API is properly specified.
+            ieOptions.SetLoggingPreference(LogType.Driver, browserSettings.LogLevel);
+            ieOptions.SetLoggingPreference(LogType.Browser, browserSettings.LogLevel);
 
             try
             {
                 return new RemoteWebDriver(service.ServiceUrl, ieOptions);
-            }
-            catch (InvalidOperationException ioEx)
-            {
-                Console.WriteLine("The browser is not installed on the machine. Edit the app.config file to use an installed browser.");
-                Console.WriteLine(ioEx);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Creates an istance of GhostDriver (embedded in PhantomJS.) This is the embedded GhostDriver. 
-        /// </summary>
-        /// <remarks> 
-        /// https://raw.githubusercontent.com/wiki/SeleniumHQ/selenium/DesiredCapabilities.md
-        /// ==================================================================
-        ///     --port=PORT_GHOSTDRIVER_SHOULD_LISTEN_ON
-        ///     --logFile=PATH_TO_LOGFILE
-        ///     --logLevel=(INFO|DEBUG|WARN|ERROR)
-        ///     --logColor=(false|true)
-        /// phantomJsOptions.AddAdditionalCapability("phantomjs.ghostdriver.cli.args", new[] { "--logLevel=INFO", $"--logFile={TestContext.CurrentContext.TestDirectory}\\ghostdriver.log" });
-        /// ===================================================================
-        ///     --webdriver-logfile=[val]            File where to write the WebDriver's Log (default 'none') (NOTE: needs '--webdriver')
-        ///     --webdriver-loglevel=[val]           WebDriver Logging Level: (supported: 'ERROR', 'WARN', 'INFO', 'DEBUG') (default 'INFO') (NOTE: needs '--webdriver')
-        /// phantomJsOptions.AddAdditionalCapability("phantom.cli.args", new[] { "--wd", "--webdriver-loglevel=INFO", $"--webdriver-logfile={TestContext.CurrentContext.TestDirectory}\\phantomjs.log"});
-        /// </remarks>
-        /// <param name="service"></param>
-        /// <returns></returns>
-        private static RemoteWebDriver CreatePhantomDriver(DriverService service)
-        {
-            var phantomJsOptions = new PhantomJSOptions();
-            if (Debugger.IsAttached)
-            {
-                // PhantomJS supports BROWSER and NETWORK (HAR).
-                phantomJsOptions.SetLoggingPreference(LogType.Driver, LogLevel.Debug);
-                phantomJsOptions.SetLoggingPreference(LogType.Browser, LogLevel.Debug);
-            }
-
-            try
-            {
-                return new RemoteWebDriver(service.ServiceUrl, phantomJsOptions.ToCapabilities());
             }
             catch (InvalidOperationException ioEx)
             {
@@ -225,7 +200,8 @@ namespace Test.Automation.Selenium
 
             if (Debugger.IsAttached)
             {
-                edgeDriverService.UseVerboseLogging = true;
+                // Sets the logging level = DEBUG when true for file in .LogPath path; else WARN.
+                edgeDriverService.UseVerboseLogging = browserSettings.EnableVerboseLogging;
             }
 
             return edgeDriverService;
@@ -242,7 +218,9 @@ namespace Test.Automation.Selenium
             {
                 var logPath = Path.Combine(binariesPath, "chromedriver.log");
                 chromedriverService.LogPath = logPath;
-                chromedriverService.EnableVerboseLogging = true;     // Sets DEBUG logging level for file in .LogPath path.
+
+                // Sets the logging level = DEBUG when true for file in .LogPath path; else WARN.
+                chromedriverService.EnableVerboseLogging = browserSettings.EnableVerboseLogging;     
             }
 
             return chromedriverService;
@@ -260,38 +238,15 @@ namespace Test.Automation.Selenium
             {
                 var logFile = Path.Combine(binariesPath, "IEDriverServer.log");
                 ieDriverService.LogFile = logFile;
-                ieDriverService.LoggingLevel = InternetExplorerDriverLogLevel.Debug;    // Sets Logging level for file in .LogFile path.
+
+                // IE is different. It can set multiple logging levels.
+                // Sets the logging level = DEBUG when true for file in .LogPath path; else WARN.
+                ieDriverService.LoggingLevel = browserSettings.EnableVerboseLogging
+                    ? InternetExplorerDriverLogLevel.Debug
+                    : InternetExplorerDriverLogLevel.Warn;
             }
 
             return ieDriverService;
-        }
-
-        /// <summary>
-        /// Creates an instance of PhantomJSDriverService.
-        /// Options set in PhantomJSDriverService affect phantomjs.exe.
-        ///</summary>
-        /// <remarks>
-        /// Use HAR viewer to view .HAR (HTTP archive) files. HAR viewer for Chrome extension does not work??
-        /// When LogFile is null or empty string, the output goes to the console instead of a file.
-        /// NOTE:  var logFile = "phantomjsdriver.log"; // Goes to C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE
-        /// </remarks>
-        /// <param name="browserSettings"></param>
-        /// <param name="binariesPath">the path to the binaries directory</param>
-        private static PhantomJSDriverService CreatePhantomJsDriverService(BrowserSettings browserSettings, string binariesPath)
-        {
-            var webDriver = Path.Combine(binariesPath, "phantomjs.exe");
-            ConfigureFirewallPortRule("Phantom JS is a headless WebKit with JavaScript API", webDriver);
-            var phantomJs = PhantomJSDriverService.CreateDefaultService(binariesPath, "phantomjs.exe");
-            phantomJs.HideCommandPromptWindow = browserSettings.HideCommandPromptWindow;
-            phantomJs.Port = 8910;
-
-            if (Debugger.IsAttached)
-            {
-                var logFile = Path.Combine(binariesPath, "phantomjsdriver.log");
-                phantomJs.LogFile = logFile;
-            }
-
-            return phantomJs;
         }
 
         /// <summary>
@@ -361,7 +316,7 @@ namespace Test.Automation.Selenium
         /// <summary>
         /// Checks if WebDriver process is running and immediately stops the process.
         /// Remove the '.exe' extension from the process name.
-        /// [ chromedriver | IEDriverServer | phantomjs ]
+        /// [ chromedriver | IEDriverServer ]
         /// </summary>
         private static void KillWebDriverProcess(string processName)
         {
@@ -383,5 +338,6 @@ namespace Test.Automation.Selenium
                 }
             }
         }
+        #endregion
     }
 }

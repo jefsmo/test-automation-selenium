@@ -10,7 +10,6 @@ namespace Test.Automation.Selenium.Settings
     /// </summary>
     public sealed class CustomDriverTypeConverter : ConfigurationConverterBase
     {
-        // ReSharper disable once MemberCanBePrivate.Global
         internal bool ValidateType(object value, Type expected)
         {
             return (value == null) || (value.GetType() == expected);

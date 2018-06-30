@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Configuration;
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace Test.Automation.Selenium.Settings
 {

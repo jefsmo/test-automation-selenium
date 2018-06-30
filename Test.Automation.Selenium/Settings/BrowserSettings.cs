@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Configuration;
 using System.Drawing;
-// ReSharper disable ClassNeverInstantiated.Global
+using OpenQA.Selenium;
 
 namespace Test.Automation.Selenium.Settings
 {
@@ -58,18 +58,48 @@ namespace Test.Automation.Selenium.Settings
         public double DefaultWaitTimeout => (double) this["DefaultWaitTimeout"];
 
         /// <summary>
-        /// Sets a default Chrome browser download directory.
-        /// (Chrome only)
+        /// Gets or Sets a default Chrome browser download directory. (Chrome only)
         /// </summary>
         [ConfigurationProperty("DownloadDefaultDir", IsRequired = false)]
-        public string DownloadDefaultDir => (string) this["DownloadDefaultDir"];
+        public string DownloadDefaultDir
+        {
+            get
+            {
+                return (string)this["DownloadDefaultDir"];
+            }
+            set
+            {
+                this["DownloadDefaultDir"] = value;
+            }
+        }
 
         /// <summary>
-        /// Gets the setting for running Chrome in a headless environment.
+        /// Gets the setting for running Chrome in a headless environment. (Chrome only)
         /// Default = false.
-        /// (Chrome only)
         /// </summary>
         [ConfigurationProperty("IsHeadless", IsRequired = false, DefaultValue = false)]
         public bool IsHeadless => (bool)this["IsHeadless"];
+
+        /// <summary>
+        /// Gets the EnableVerboseLogging setting for DriverService logging.
+        /// Default = false.
+        /// </summary>
+        [ConfigurationProperty("EnableVerboseLogging", IsRequired = false, DefaultValue = false)]
+        public bool EnableVerboseLogging => (bool)this["EnableVerboseLogging"];
+
+        /// <summary>
+        /// Gets the LogLevel setting to determine levels of logging available to WebDriver instances.
+        /// Default = LogLevel.Warning.
+        /// </summary>
+        [ConfigurationProperty("LogLevel", IsRequired = false, DefaultValue = LogLevel.Warning)]
+        public LogLevel LogLevel => (LogLevel)this["LogLevel"];
+
+        /// <summary>
+        /// Gets the IntroduceInstabilityByIgnoringProtectedModeSettings setting. (IE only.)
+        /// Default = false.
+        /// Use to fix exception when IE 'Enable Protected Mode' is not checked/un-checked for all zones.
+        /// </summary>
+        [ConfigurationProperty("IntroduceInstabilityByIgnoringProtectedModeSettings", IsRequired = false, DefaultValue = false)]
+        public bool IntroduceInstabilityByIgnoringProtectedModeSettings => (bool)this["IntroduceInstabilityByIgnoringProtectedModeSettings"];
     }
 }
