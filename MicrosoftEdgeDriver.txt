@@ -1,0 +1,9 @@
+USAGE:
+        MicrosoftWebDriver [OPTIONS]
+
+OPTIONS:
+        --host=<HostName>    Host IP to use for the WebDriver server (default: localhost)
+        --port=<PortNumber>  Port to use for the WebDriver server (default: 17556)
+        --package=<Package>  ApplicationUserModelId (AUMID) for the application to be launched by the WebDriver server
+        --verbose            Outputs requests received and responses sent by the WebDriver server
+        --silent             Outputs nothing

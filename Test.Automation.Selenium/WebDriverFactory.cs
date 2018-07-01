@@ -7,7 +7,6 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.IE;
-using OpenQA.Selenium.PhantomJS;
 using OpenQA.Selenium.Remote;
 using Test.Automation.Selenium.Settings;
 
@@ -16,6 +15,16 @@ namespace Test.Automation.Selenium
     /// <summary>
     /// Represents a factory for methods to create a DriverService and RemoteWebDriver for testing with a desired browser.
     /// </summary>
+    /// <remarks>
+    /// Log Levels
+    /// ------------
+    /// OFF: Turns off logging
+    /// SEVERE: Messages about things that went wrong. For instance, an unknown command.
+    /// WARNING:  Messages about things that may be wrong but was handled. For instance, a handled exception.
+    /// INFO: Messages of an informative nature. For instance, information about received commands.
+    /// DEBUG: Messages for debugging. For instance, information about the state of the driver.
+    /// ALL: All log messages. A way to collect all information regardless of which log levels that are supported.
+    /// </remarks>
     /// <remarks>
     /// Log type	    Meaning
     /// -----------     -------------------------------------------
@@ -44,7 +53,7 @@ namespace Test.Automation.Selenium
                 case DriverType.IE:
                     KillWebDriverProcess("IEDriverServer");
                     return CreateIeDriverService(browserSettings, binariesPath);
-                case DriverType.Edge:
+                case DriverType.MicrosoftEdge:
                     KillWebDriverProcess("MicrosoftWebDriver");
                     return CreateEdgeDriverService(browserSettings, binariesPath);
                 default:
@@ -68,7 +77,7 @@ namespace Test.Automation.Selenium
                     return CreateChromeDriver(driverservice, browserSettings);
                 case DriverType.IE:
                     return CreateIeDriver(driverservice, browserSettings);
-                case DriverType.Edge:
+                case DriverType.MicrosoftEdge:
                     return CreateMicrosoftWebDriver(driverservice, browserSettings);
                 default:
                     Console.WriteLine("Support for this browser's WebDriver has not been added to the base class. Update the base class to use this WebDriver.");
@@ -77,15 +86,21 @@ namespace Test.Automation.Selenium
         }
 
         #region PRIVATE METHODS
+
         private static RemoteWebDriver CreateMicrosoftWebDriver(DriverService service, BrowserSettings browserSettings)
         {
             var edgeOptions = new EdgeOptions
             {
-                PageLoadStrategy = PageLoadStrategy.Normal
+                PageLoadStrategy = PageLoadStrategy.Normal,
+
+                //AcceptInsecureCertificates = true,
+                //Proxy = new Proxy(),
+                //StartPage = "https://www.bing.com/",
+                //UnhandledPromptBehavior = UnhandledPromptBehavior.Default,
+                //UseInPrivateBrowsing = true
             };
 
-            edgeOptions.SetLoggingPreference(LogType.Driver, browserSettings.LogLevel);
-            edgeOptions.SetLoggingPreference(LogType.Browser, browserSettings.LogLevel);
+            // MicrosoftEdge does not support instance logging.
 
             try
             {
@@ -103,11 +118,14 @@ namespace Test.Automation.Selenium
         {
             // CAUTION: Using the "no-sandbox" option leaves 2 chrome processes open after calling Driver.Quit();
             //          It appears that "no-sandbox" is no longer required for running in Visual Studio.
+            //
+
             var args = new List<string>
             {
                 "disable-plugins", "disable-plugins-discovery", "disable-extensions"
             };
 
+            // Headless Chrome setting.
             if (browserSettings.IsHeadless)
             {
                 args.AddRange(new List<string>{
@@ -129,14 +147,15 @@ namespace Test.Automation.Selenium
             var chromeOptions = new ChromeOptions();
             chromeOptions.AddArguments(args);
 
+            // Chrome Download Default Dir setting.
             if (!string.IsNullOrEmpty(browserSettings.DownloadDefaultDir))
             {
                 chromeOptions.AddUserProfilePreference("download.default_directory", $"{browserSettings.DownloadDefaultDir}");
             }
 
-            // Chrome supports DRIVER and BROWSER.
-            chromeOptions.SetLoggingPreference(LogType.Driver, browserSettings.LogLevel);
+            // Chrome supports DRIVER and BROWSER instance logs.
             chromeOptions.SetLoggingPreference(LogType.Browser, browserSettings.LogLevel);
+            chromeOptions.SetLoggingPreference(LogType.Driver, browserSettings.LogLevel);
 
             try
             {
@@ -156,29 +175,36 @@ namespace Test.Automation.Selenium
             {
                 EnsureCleanSession = true,
                 IgnoreZoomLevel = true,
-                PageLoadStrategy = PageLoadStrategy.Normal,
-                // IE requires 'Enable Protected Mode' security setting to be the same for all zones.
+
+                // IE WebDriver requires 'Enable Protected Mode' security setting to be the same for all zones: on or off.
                 // This setting is a workaround for that requirement.
-                IntroduceInstabilityByIgnoringProtectedModeSettings = browserSettings.IntroduceInstabilityByIgnoringProtectedModeSettings
+                IntroduceInstabilityByIgnoringProtectedModeSettings = browserSettings.IntroduceInstabilityByIgnoringProtectedModeSettings,
+                PageLoadStrategy = PageLoadStrategy.Normal,
+
+                //AcceptInsecureCertificates = false,
+                //BrowserAttachTimeout = TimeSpan.FromSeconds(30),
+                //BrowserCommandLineArguments = "",
+                //ElementScrollBehavior = InternetExplorerElementScrollBehavior.Default,
+                //EnableNativeEvents = true,
+                //EnablePersistentHover = true,
+                //FileUploadDialogTimeout = TimeSpan.FromSeconds(30),
+                //ForceCreateProcessApi = true,
+                //ForceShellWindowsApi = true,
+                //InitialBrowserUrl = "",
+                //Proxy = new Proxy(),
+                //RequireWindowFocus = true,  
+                //UnhandledPromptBehavior = UnhandledPromptBehavior.Default,
+                //UsePerProcessProxy = false,
             };
 
-            // IEDriverServer log JSON:
-            //"timeouts" : 
-			//{
-            //    "implicit" : 0,
-			//	  "pageLoad" : 300000,
-			//	  "script" : 0
-            //}
             // Time (in ms) that time-limited commands are permitted to run.
-            // Default = 0 ms means no  time limit.
+            // Default = 0 ms: no  time limit.
             // Valid values are: "script" for script timeouts, "implicit" for modifying the implicit wait timeout and "page load" for setting a page load timeout.
             ieOptions.AddAdditionalCapability(CapabilityType.Timeouts, new { @implicit = 0, pageLoad = 300000, script = 0 }, true);
 
             //  The IE driver does not support getting logs of any kind.
             //  Those commands have not been implemented.
             //  They will be implemented only when the server-side API is properly specified.
-            ieOptions.SetLoggingPreference(LogType.Driver, browserSettings.LogLevel);
-            ieOptions.SetLoggingPreference(LogType.Browser, browserSettings.LogLevel);
 
             try
             {
@@ -194,15 +220,23 @@ namespace Test.Automation.Selenium
 
         private static DriverService CreateEdgeDriverService(BrowserSettings browserSettings, string binariesPath)
         {
+            // See:
+            // https://docs.microsoft.com/en-us/microsoft-edge/webdriver for next version server flags.
+            // https://seleniumhq.github.io/selenium/docs/api/java/org/openqa/selenium/edge/EdgeDriver.html 
+
             var edgeDriverService = EdgeDriverService.CreateDefaultService(binariesPath, "MicrosoftWebDriver.exe");
+
             edgeDriverService.HideCommandPromptWindow = browserSettings.HideCommandPromptWindow;
             edgeDriverService.Port = 17556;
+            edgeDriverService.SuppressInitialDiagnosticInformation = false;
+            edgeDriverService.UseVerboseLogging = browserSettings.EnableVerboseLogging;
 
-            if (Debugger.IsAttached)
-            {
-                // Sets the logging level = DEBUG when true for file in .LogPath path; else WARN.
-                edgeDriverService.UseVerboseLogging = browserSettings.EnableVerboseLogging;
-            }
+            //edgeDriverService.Host = "";
+            //edgeDriverService.HostName = "localhost";
+            //edgeDriverService.Package = "";
+            //edgeDriverService.UseSpecCompliantProtocol = true; // Throws: Cannot start the driver service on http://localhost:17556/
+
+            // There is no setting for LogFile/LogPath! So we do not expect to see a service log.
 
             return edgeDriverService;
         }
@@ -219,7 +253,8 @@ namespace Test.Automation.Selenium
                 var logPath = Path.Combine(binariesPath, "chromedriver.log");
                 chromedriverService.LogPath = logPath;
 
-                // Sets the logging level = DEBUG when true for file in .LogPath path; else WARN.
+                // Sets the logging level = DEBUG when true for file in .LogPath path; else INFO.
+                // i.e.:  chromedriver.exe --verbose --log-path=chromedriver.log
                 chromedriverService.EnableVerboseLogging = browserSettings.EnableVerboseLogging;     
             }
 
@@ -240,10 +275,10 @@ namespace Test.Automation.Selenium
                 ieDriverService.LogFile = logFile;
 
                 // IE is different. It can set multiple logging levels.
-                // Sets the logging level = DEBUG when true for file in .LogPath path; else WARN.
+                // Sets the logging level = DEBUG when true for file in .LogPath path; else INFO.
                 ieDriverService.LoggingLevel = browserSettings.EnableVerboseLogging
                     ? InternetExplorerDriverLogLevel.Debug
-                    : InternetExplorerDriverLogLevel.Warn;
+                    : InternetExplorerDriverLogLevel.Info;
             }
 
             return ieDriverService;
@@ -259,8 +294,8 @@ namespace Test.Automation.Selenium
         /// </remarks>
         /// <remarks>
         /// Known WebDrivers that require a firewall rule:
-        ///     IEDriverServer.exe = "Command line server for the IE driver"
-        ///     phantomjs.exe = "Phantom JS is a headless WebKit with JavaScript API"
+        /// 1. IEDriverServer.exe = "Command line server for the IE driver"
+        /// 2. phantomjs.exe = "Phantom JS is a headless WebKit with JavaScript API"
         /// </remarks>
         /// <param name="firewallRuleName">the rule name</param>
         /// <param name="webDriver">the full path to the webdriver exe</param>
@@ -338,6 +373,7 @@ namespace Test.Automation.Selenium
                 }
             }
         }
+
         #endregion
     }
 }

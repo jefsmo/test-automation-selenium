@@ -68,7 +68,7 @@ namespace Test.Automation.Selenium
 
             // Delete the log created by the DriverService in the binaries directory, it has been copied to the logs directory.
             //var logs = Directory.GetFiles(".", "*.log");    // VsTest
-            //var logs = Directory.GetFiles(TestContext.CurrentContext.TestDirectory, "*.log"); //NUnit
+            //var logs = Directory.GetFiles(TestContext.CurrentContext.TestDirectory, "*.log"); // NUnit
 
             var logs = Directory.GetFiles(TestContext.CurrentContext.TestDirectory, "*.log");
 
@@ -190,26 +190,32 @@ namespace Test.Automation.Selenium
 
         private void LogWebDriverLogs()
         {
-            if (Driver == null)
+            // The IE driver does not support getting logs of any kind.
+            // Those commands have not been implemented.
+            // They will be implemented only when the server-side API is properly specified.
+            // The MicrosoftEdge driver throws an 'Unknown Command' exception.
+            if (
+                Driver == null
+                || Driver.Capabilities.BrowserName == "internet explorer"
+                || Driver.Capabilities.BrowserName == "MicrosoftEdge"
+                )
             {
                 return;
             }
 
             var logTypes = default(IEnumerable<string>);
 
-            //  The IE driver does not support getting logs of any kind.
-            //  Those commands have not been implemented.
-            //  They will be implemented only when the server-side API is properly specified.
             try
             {
                 var logs = Driver.Manage().Logs;
                 logTypes = logs.AvailableLogTypes;
             }
-            catch (NullReferenceException nullEx)
+            catch (Exception ex)
             {
                 if (Debugger.IsAttached)
                 {
-                    Console.WriteLine($"WebDriver Logs not available for '{Driver.Capabilities.BrowserName}' WebDriver; EXCEPTION: {nullEx.Message}");
+                    // Trap any exceptions if the webdriver does not support instance logs.
+                    Console.WriteLine($"WebDriver Logs not available for '{Driver.Capabilities.BrowserName}' WebDriver; EXCEPTION: {ex.Message}");
                 }
                 return;
             }
@@ -251,11 +257,8 @@ namespace Test.Automation.Selenium
                 case DriverType.IE:
                     RenameServiceLog("IEDriverServer");
                     break;
-                case DriverType.PhantomJs:
-                    RenameServiceLog("phantomjsdriver");
-                    break;
-                case DriverType.Edge:
-                    RenameServiceLog("Edge");
+                case DriverType.MicrosoftEdge:
+                    RenameServiceLog("MicrosoftEdge");
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(BrowserSettings.Name), (int)BrowserSettings.Name, null);
@@ -271,6 +274,10 @@ namespace Test.Automation.Selenium
 
             if (!File.Exists(sourcePath))
             {
+                if (Debugger.IsAttached)
+                {
+                    Console.WriteLine($"No driver service log found for '{browserName}.log' in the test dir '{TestContext.CurrentContext.TestDirectory}'.");
+                }
                 return;
             }
 

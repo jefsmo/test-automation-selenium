@@ -28,7 +28,7 @@ namespace Test.Automation.Selenium.Settings
 
         /// <summary>
         /// Gets the WebDriver browser starting window size. 
-        /// Default = 1600 x 900.
+        /// Default = 1600, 900.
         /// </summary>
         [ConfigurationProperty("Size", IsRequired = false, DefaultValue = "1600, 900")]
         [TypeConverter(typeof(CustomSizeConverter))]
@@ -58,23 +58,13 @@ namespace Test.Automation.Selenium.Settings
         public double DefaultWaitTimeout => (double) this["DefaultWaitTimeout"];
 
         /// <summary>
-        /// Gets or Sets a default Chrome browser download directory. (Chrome only)
+        /// Gets a default Chrome browser download directory. (Chrome only.)
         /// </summary>
         [ConfigurationProperty("DownloadDefaultDir", IsRequired = false)]
-        public string DownloadDefaultDir
-        {
-            get
-            {
-                return (string)this["DownloadDefaultDir"];
-            }
-            set
-            {
-                this["DownloadDefaultDir"] = value;
-            }
-        }
+        public string DownloadDefaultDir => (string)this["DownloadDefaultDir"];
 
         /// <summary>
-        /// Gets the setting for running Chrome in a headless environment. (Chrome only)
+        /// Gets the setting for running Chrome in a headless environment. (Chrome only.)
         /// Default = false.
         /// </summary>
         [ConfigurationProperty("IsHeadless", IsRequired = false, DefaultValue = false)]
@@ -83,13 +73,15 @@ namespace Test.Automation.Selenium.Settings
         /// <summary>
         /// Gets the EnableVerboseLogging setting for DriverService logging.
         /// Default = false.
+        /// Verbose is DEBUG level, otherwise it is INFO level.
         /// </summary>
         [ConfigurationProperty("EnableVerboseLogging", IsRequired = false, DefaultValue = false)]
         public bool EnableVerboseLogging => (bool)this["EnableVerboseLogging"];
 
         /// <summary>
-        /// Gets the LogLevel setting to determine levels of logging available to WebDriver instances.
+        /// Gets the LogLevel setting to determine levels of logging available to WebDriver instances (usually BROWSER and DRIVER.)
         /// Default = LogLevel.Warning.
+        /// [ All | Debug | Info | *Warning | Severe | Off ]
         /// </summary>
         [ConfigurationProperty("LogLevel", IsRequired = false, DefaultValue = LogLevel.Warning)]
         public LogLevel LogLevel => (LogLevel)this["LogLevel"];

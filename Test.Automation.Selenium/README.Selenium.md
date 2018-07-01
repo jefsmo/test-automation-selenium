@@ -198,7 +198,7 @@ Logs Dir                 	C:\Source\Repos\test-automation-selenium\UnitTestProje
   <browserSettings>
     <!--
     *-Denotes default value. Settings are optional unless noted otherwise.
-    Name                      WebDriver browser name.                           [ *Chrome | IE | Edge ]
+    Name                      WebDriver browser name.                           [ *Chrome | IE | MicrosoftEdge ]
     Position                  Browser window position. (from upper left corner) [ *(10, 10) ]
     Size                      Browser window size. (width, height)              [ *(1600, 900) ] 
     IsMaximized               Maximize browser window. (overrides window size)  [ true | *false ]

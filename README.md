@@ -1,35 +1,52 @@
-# Test.Automation.* Projects
+# Test Automation Selenium
+
 **README.md**
 
 ## History
-|Date|Version|Notes|
+|Date|Notes|
 |---|---|---|
-|2018-06-29|1.0.4|Fix IE bugs by adding 'IntroduceInstabilityByIgnoringProtectedModeSettings' arg |
-|2018-02-19|1.0.2|Fix chromedriver memory leak by removing 'no-sandbox' arg|
-|2018-02-19|1.0.1|Bug fixes|
-|2017-12-05|1.0.0|Initial Release|
+|2018-06-29|Fix IE bugs by adding 'IntroduceInstabilityByIgnoringProtectedModeSettings' arg |
+|2018-02-19|Fix chromedriver memory leak by removing 'no-sandbox' arg|
+|2018-02-19|Bug fixes|
+|2017-12-05|Initial Release|
 
+## Contents
+[Test.Automation Projects Overview](#test.automation-projects-overview)  
+[Test.Automation.Base](#test.automation.base)  
+[Test.Automation.Selenium](#test.automation.selenium)  
+[Test.Automation.Data](#test.automation.data)  
+[Test.Automation.Api](#test.automation.api)  
+[Test.Automation WebDriver Projects](#test.automation-webdriver-projects)  
+[WebDriver Download Links](#webdriver-download-links)  
+[NUnit Test Framework Workflow](#nunit-test-framework-workflow)  
+[WebDriver Test Examples](#webdriver-test-examples)  
+[Debug Mode Output](#debug-mode-output)  
+[Example App.Config File](#example-app.config-file)  
+[TroubleShooting](#troubleshooting)  
+[Creating Packages Locally](#creating-packages-locally)  
+
+## Test.Automation Projects Overview
 The Test.Automation.* projects create NuGet packages for test automation.  
 The NuGet packages can be generated locally to a packages folder on your hard drive.  
-`> C:\Packages`
+**`> C:\Packages`**
 
 Once you have created the packages locally, use Visual Studio NuGet package manager to create a local package source.  
 Add packages to your test project with NuGet package manager pointing to the local package source.
 
 ### Test.Automation.Base
-This project provides common base class logging methods for test automation test class.  
+This project provides common base class logging methods for test automation test classes.  
 The test attributes and test context directory locations are logged to the console window if the test does not pass or is run in debug mode.
 
 The base class is:  
    - **TestAutomationBase**
 
 ### Test.Automation.Selenium
-This project creates a NuGet package containing that enables Selenium WebDriver tests.  
+This project creates a NuGet package that enables Selenium WebDriver tests.  
 The package contains a base class for the NUnit test framework.  
 Once a test class inherits from the base class, it just needs to pass a URL to the WebDriver to start a Selenium test.  
-The base class handles WebDriver creation and disposal.  
-Each test gets a new WebDriver instance.  
-It also logs test repro data when a test fails or is run in debug mode.  
+- The base class handles WebDriver creation and disposal.  
+- Each test gets a new WebDriver instance.  
+- Each test also logs test repro data when a test fails or is run in debug mode.  
 
 The base class is:
 - **NUnitSeleniumBase**
@@ -51,9 +68,9 @@ This project creates an API base class that can be used in a project to create m
 Call the ExecuteAsync() method by passing in an HTTP Request.
 
 ### Test.Automation WebDriver Projects
-The WebDriver projects create NuGet packages for WebDrivers.  
-This is to ensure the test has the appropriate WebDriver copied to the binaries directory when the test is run.  
-You can update the WebDriver to a current version by copying it to the project and regenerating the NuGet package.  
+The WebDriver projects create NuGet packages for browser spcecific WebDrivers.  
+Each test project has the appropriate WebDriver copied to the binaries directory when the test is run.  
+You can update the WebDriver to a current version by copying the new version to the project and regenerating the NuGet package.  
 
 Each WebDriver is related to a specific browser.  
 You need a WebDriver for each browser you intend to run tests against.  
@@ -63,20 +80,19 @@ The solution includes the following WebDriver projects:
 |Driver|Browser|Project|
 |----|----|----|
 |ChromeDriver|Chrome|Test.Automation.ChromeDriver|
-|Headless Chrome|Chrome|Test.Automation.ChromeDriver|
+|Headless Chrome|Chrome in headless mode|Use ChromeDriver <br> set IsHeadless="true"|
 |IEDriverServer|Internet Explorer|Test.Automation.IEDriverServer|
 |MicrosoftWebDriver|Edge browser|Test.Automation.MicrosoftWebDriver|
 
-## WebDriver Download Links
+#### WebDriver Download Links
 **README.WebDriver.md**
 
 |Browser | WebDriver | Download |Notes|
 |-----|-----|-----|----|
 | [Chrome](https://www.google.com/chrome/browser/desktop/index.html?system=true&standalone=1) | chromedriver.exe | [ChromeDriver](https://sites.google.com/a/chromium.org/chromedriver/downloads) | [Wiki](https://github.com/SeleniumHQ/selenium/wiki/ChromeDriver) <br> Use Chrome's 'alternative installer'<br>Recommended for testing Web applications built with moden javascript frameworks like React and Ember |
-| HeadLess Chrome | chromedriver.exe | see above | Headless web testing<br>Set **`IsHeadless=true`** in App.config |
-| [Internet Explorer (IE)](https://support.microsoft.com/en-us/help/17621/internet-explorer-downloads) | IEDriverServer.exe | [IEDriverServer](http://selenium-release.storage.googleapis.com/index.html) <br> [Required Configuration](https://github.com/SeleniumHQ/selenium/wiki/InternetExplorerDriver#required-configuration) | Windows default browser prior to Windows 10 |
-| [Microsoft Edge](https://www.microsoft.com/en-us/windows/microsoft-edge#AoPhgFHFcSwpqU6Z.97) | MicrosoftWebDriver.exe | [MicrosoftWebDriver](https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/)| Windows 10 default browser |
-| PhantomJS | phantomjs.exe | [PhantomJS](http://phantomjs.org/download.html) | PhantomJS is **deprecated!**<br>The project has been abandoned.<br>Use Headless Chrome for headless web testing |
+| HeadLess Chrome | chromedriver.exe | see above | Headless web testing<br>Set **`IsHeadless="true"`** in App.config |
+| [Internet Explorer (IE)](https://support.microsoft.com/en-us/help/17621/internet-explorer-downloads) | IEDriverServer.exe | [IEDriverServer](http://selenium-release.storage.googleapis.com/index.html)  | [Required Configuration](https://github.com/SeleniumHQ/selenium/wiki/InternetExplorerDriver#required-configuration) <br> Windows default browser prior to Windows 10 |
+| [Microsoft Edge](https://www.microsoft.com/en-us/windows/microsoft-edge#AoPhgFHFcSwpqU6Z.97) | MicrosoftWebDriver.exe | [MicrosoftWebDriver](https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/)| [WebDriver](https://docs.microsoft.com/en-us/microsoft-edge/webdriver) <br> Windows 10 default browser <br> Will be a Feature on Demand in a future Windows version |
 
 ## NUnit Test Framework Workflow
 - Create a Visual Studio Test Project using the VS test project template.
@@ -85,19 +101,19 @@ The solution includes the following WebDriver projects:
 - Delete the test class added by the template. 
 - Add **Test.Automation.Selenium** NuGet package to the test project.
 - Add a test class to the test project.
-- Add `[TestFixture]` attribute to the test class.
+- Add **`[TestFixture]`** attribute to the test class.
 - Ensure the test class inherits from the **NUnitSeleniumBase**.
-   - `public class UnitTest1 : NUnitSeleniumBase`  
+   - **`public class UnitTest1 : NUnitSeleniumBase`**  
 - Add a test method attribute to the method.
-   - Add `[Test]` attribute to make it a test method.
+   - Add **`[Test]`** attribute to make it a test method.
 - To start an instance of the WebDriver in your test, you must assign an URL.
-   - `Driver.Url = "http://www.bing.com"; `
+   - **`Driver.Url = "http://www.bing.com";`**
    - You can configure a base URL for your tests in the App.config file
 - Edit the App.config file in your test project to customize WebDriver settings. 
 - Run your test:
   - If the test fails (or is run in debug mode) you can find debugging information in the output window.
-    - A screenshot is automatically taken for failed tests (and in debug mode.)
-    - WebDriver logs are automatically created for failed tests (and in debug mode.)
+  - A screenshot is automatically taken for failed tests (and in debug mode.)
+  - WebDriver logs are automatically created for failed tests (and in debug mode.)
   - By default, **no output** is written for tests that pass.
 
 
@@ -186,10 +202,9 @@ Binaries Dir             	C:\Source\Repos\test-automation-selenium\UnitTestProje
 Deployment Dir           	C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE
 Logs Dir                 	C:\Source\Repos\test-automation-selenium\UnitTestProject1\bin\Debug
 ================================================================================
-
 ~~~
 
-## Example App Config File
+### Example App.config File
 An App.config file should be installed by the Test.Automation.Selenium package.  
 You can use this file as a reference if the original file is deleted or broken.  
 
@@ -233,7 +248,7 @@ You can use this file as a reference if the original file is deleted or broken.
   <browserSettings>
     <!--
     *-Denotes default value. Settings are optional unless noted otherwise.
-    Name                      WebDriver browser name.                           [ *Chrome | IE | Edge ]
+    Name                      WebDriver browser name.                           [ *Chrome | IE | MicrosoftEdge ]
     Position                  Browser window position. (from upper left corner) [ *(10, 10) ]
     Size                      Browser window size. (width, height)              [ *(1600, 900) ] 
     IsMaximized               Maximize browser window. (overrides window size)  [ true | *false ]
@@ -254,7 +269,23 @@ You can use this file as a reference if the original file is deleted or broken.
 
 ```
 
-## Creating Local Packages Reference
+## TroubleShooting
+#### No MicrosoftWebDriver logs
+~~~text
+UPDATE: Console logging will be supported in a future version of Microsoft Web Driver.
+[Platform Status](https://developer.microsoft.com/en-us/microsoft-edge/platform/status/consoleloggingapis/?q=log)  
+
+First, the JsonWireProtocol as defined by SeleniumHQ is deprecated.
+It was in this protocol specification that the logging capabilities for the WebDriver session were defined.
+
+“Status: OBSOLETE See current W3C specification for WebDriver”
+
+The current WebDriver Recommendation does not have logging capabilities defined.
+I do not know why these were dropped.
+Perhaps these logs were thought best collected at each source?
+~~~
+
+## Creating Packages Locally
 ### OctoPack Command Line Reference
 #### Create a Local NuGet Package with OctoPack
 - Add a `.nuspec` file to each project in the solution that you want to package with NuGet.
