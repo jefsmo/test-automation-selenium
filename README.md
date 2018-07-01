@@ -4,7 +4,7 @@
 
 ## History
 |Date|Notes|
-|---|---|---|
+|---|---|
 |2018-06-29|Fix IE bugs by adding 'IntroduceInstabilityByIgnoringProtectedModeSettings' arg |
 |2018-02-19|Fix chromedriver memory leak by removing 'no-sandbox' arg|
 |2018-02-19|Bug fixes|
