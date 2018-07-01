@@ -53,6 +53,11 @@ namespace Test.Automation.Selenium
         public void StartTestRun()
         {
             // Only a single Service instance is started for the entire test run.
+            if (BrowserSettings == null)
+            {
+                throw new ApplicationException("No '<browserSettings>' section found in App.config file.\r\nEnsure the App.config file exists and it contains a '<browserSettings>' section.");
+            }
+
             DriverService = WebDriverFactory.CreateDriverService(BrowserSettings, TestContext.CurrentContext.TestDirectory);
             DriverService.Start();
         }
@@ -97,6 +102,16 @@ namespace Test.Automation.Selenium
         [SetUp]
         public void StartTest()
         {
+            if (!DriverService.IsRunning)
+            {
+                throw new ApplicationException($"The DriverService '{DriverService}' is not running.");
+            }
+
+            if (BrowserSettings == null)
+            {
+                throw new ApplicationException("No '<browserSettings>' section found in App.config file.\r\nEnsure the App.config file exists and it contains a '<browserSettings>' section.");
+            }
+
             Driver = WebDriverFactory.CreateWebDriver(BrowserSettings, DriverService);
             Driver.Manage().Cookies.DeleteAllCookies();
             SetBrowserWindow();
@@ -140,8 +155,8 @@ namespace Test.Automation.Selenium
             // Log test evironment info.
             var environment = new Dictionary<string, string>
             {
-                {"Run Environment", TestRunSetting.ToUpper()},
-                {"Base URI", Settings.BaseUri.AbsoluteUri}
+                {"Run Environment", TestRunSetting.ToUpper() },
+                {"Base URI", Settings.BaseUri.AbsoluteUri }
             };
             WriteLogToOutput("Environment Settings", environment);
         }
@@ -150,12 +165,14 @@ namespace Test.Automation.Selenium
         {
             var webDriver = new Dictionary<string, string>
             {
-                {"Service Name", DriverService.ToString()},
-                {"Service State", DriverService.IsRunning ? "RUNNING" : "STOPPED"},
-                {"Service Window", DriverService.HideCommandPromptWindow ? "HIDDEN" : "VISIBLE"},
-                {"Service URI", DriverService.ServiceUrl.AbsoluteUri},
-                {"Service Port", DriverService.Port.ToString()},
-                {"Process ID", DriverService.ProcessId.ToString()}
+                {"Service Name", DriverService.ToString() },
+                {"IsRunning", DriverService.IsRunning.ToString().ToUpperInvariant() },
+                {"CmdPrmptWindow", DriverService.HideCommandPromptWindow
+                ? "HIDDEN"
+                : "VISIBLE" },
+                {"Service URI", DriverService.ServiceUrl.AbsoluteUri },
+                {"Service Port", DriverService.Port.ToString() },
+                {"Process ID", DriverService.ProcessId.ToString() },
             };
             WriteLogToOutput("WebDriver Service Settings", webDriver);
         }
@@ -165,9 +182,8 @@ namespace Test.Automation.Selenium
 
             var browser = new Dictionary<string, string>
             {
-                { "Browser Name", BrowserSettings.Name.ToString() },
-                { "Browser Window", BrowserSettings.IsMaximized ? "MAXIMIZED" : "NORMAL" },
-                { "Browser Mode", BrowserSettings.IsHeadless ? "HEADLESS" : "NORMAL" }
+                {"Browser Name", Driver.Capabilities.BrowserName.ToString() },
+                {"IsMaximized", BrowserSettings.IsMaximized.ToString().ToUpperInvariant()},
             };
 
             if (!BrowserSettings.IsMaximized)
@@ -175,7 +191,34 @@ namespace Test.Automation.Selenium
                 browser.Add("Browser Size", BrowserSettings.Size.ToString());
                 browser.Add("Browser Position", BrowserSettings.Position.ToString());
             }
-            WriteLogToOutput("WebDriver Browser Settings", browser);
+
+            // Browser specific settings.
+            switch (BrowserSettings.Name)
+            {
+                case DriverType.IE:
+                    browser.Add("VerboseLogging", BrowserSettings.EnableVerboseLogging.ToString().ToUpperInvariant());
+                    browser.Add("InitialBrowserUrl", BrowserSettings.InitialBrowserUrl == string.Empty
+                        ? "Default initial start page for the WebDriver server."
+                        : BrowserSettings.InitialBrowserUrl);
+                    browser.Add("IgnoreProtectedMode", BrowserSettings.IntroduceInstabilityByIgnoringProtectedModeSettings.ToString().ToUpperInvariant());
+                    break;
+                case DriverType.Chrome:
+                    browser.Add("VerboseLogging", BrowserSettings.EnableVerboseLogging.ToString().ToUpperInvariant());
+                    browser.Add("InitialBrowserUrl", "data:");
+                    browser.Add("IsHeadless", BrowserSettings.IsHeadless.ToString().ToUpperInvariant());
+                    browser.Add("DwnldDefaultDir", BrowserSettings.DownloadDefaultDir == string.Empty
+                        ? "NOT SET"
+                        : BrowserSettings.DownloadDefaultDir);
+                    browser.Add("LogLevel", BrowserSettings.LogLevel.ToString().ToUpperInvariant());
+                    break;
+                case DriverType.MicrosoftEdge:
+                    browser.Add("InitialBrowserUrl", "about:blank");
+                    break;
+                default:
+                    throw new ArgumentException($"Invalid browser setting name '{BrowserSettings.Name}'.");
+            }
+
+            WriteLogToOutput("WebDriver Instance Settings", browser);
             
             if (Driver == null) return;
 
@@ -185,6 +228,7 @@ namespace Test.Automation.Selenium
                 {"Browser URL", Driver.Url},
                 {"Browser Title", Driver.Title}
             };
+
             WriteLogToOutput("Browser State", browserState);
         }
 

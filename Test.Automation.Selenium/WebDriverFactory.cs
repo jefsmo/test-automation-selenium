@@ -93,14 +93,16 @@ namespace Test.Automation.Selenium
             {
                 PageLoadStrategy = PageLoadStrategy.Normal,
 
-                //AcceptInsecureCertificates = true,
-                //Proxy = new Proxy(),
-                //StartPage = "https://www.bing.com/",
-                //UnhandledPromptBehavior = UnhandledPromptBehavior.Default,
-                //UseInPrivateBrowsing = true
+                /**************************************************************
+                 * MicrosoftEdge does not support instance logging.
+                 * 
+                 * AcceptInsecureCertificates = true,
+                 * Proxy = new Proxy(),
+                 * StartPage = "https://www.bing.com/",
+                 * UnhandledPromptBehavior = UnhandledPromptBehavior.Default,
+                 * UseInPrivateBrowsing = true
+                 * ***********************************************************/
             };
-
-            // MicrosoftEdge does not support instance logging.
 
             try
             {
@@ -116,9 +118,10 @@ namespace Test.Automation.Selenium
 
         private static RemoteWebDriver CreateChromeDriver(DriverService service, BrowserSettings browserSettings)
         {
-            // CAUTION: Using the "no-sandbox" option leaves 2 chrome processes open after calling Driver.Quit();
-            //          It appears that "no-sandbox" is no longer required for running in Visual Studio.
-            //
+            /******************************************************************
+             *  CAUTION: Using the "no-sandbox" option leaves 2 chrome processes open after calling Driver.Quit();
+             *           It appears that "no-sandbox" is no longer required for running in Visual Studio.
+             * ***************************************************************/
 
             var args = new List<string>
             {
@@ -173,38 +176,59 @@ namespace Test.Automation.Selenium
         {
             var ieOptions = new InternetExplorerOptions
             {
-                EnsureCleanSession = true,
-                IgnoreZoomLevel = true,
-
-                // IE WebDriver requires 'Enable Protected Mode' security setting to be the same for all zones: on or off.
-                // This setting is a workaround for that requirement.
-                IntroduceInstabilityByIgnoringProtectedModeSettings = browserSettings.IntroduceInstabilityByIgnoringProtectedModeSettings,
+                EnsureCleanSession = true,  // Clears the IE cache.
+                IgnoreZoomLevel = false,    // The IE zoom level should be set to 100% or the driver may not interact with page controls correctly.
                 PageLoadStrategy = PageLoadStrategy.Normal,
 
-                //AcceptInsecureCertificates = false,
-                //BrowserAttachTimeout = TimeSpan.FromSeconds(30),
-                //BrowserCommandLineArguments = "",
-                //ElementScrollBehavior = InternetExplorerElementScrollBehavior.Default,
-                //EnableNativeEvents = true,
-                //EnablePersistentHover = true,
-                //FileUploadDialogTimeout = TimeSpan.FromSeconds(30),
-                //ForceCreateProcessApi = true,
-                //ForceShellWindowsApi = true,
-                //InitialBrowserUrl = "",
-                //Proxy = new Proxy(),
-                //RequireWindowFocus = true,  
-                //UnhandledPromptBehavior = UnhandledPromptBehavior.Default,
-                //UsePerProcessProxy = false,
+                /**************************************************************
+                 * The IE driver does not support getting any instance logs.
+                 * Those commands have not been implemented.
+                 * They will be implemented only when the server-side API is properly specified.
+                 * ***********************************************************/
+
+                /**************************************************************
+                 * AcceptInsecureCertificates = false,
+                 * BrowserAttachTimeout = TimeSpan.FromSeconds(30),
+                 * BrowserCommandLineArguments = "",
+                 * ElementScrollBehavior = InternetExplorerElementScrollBehavior.Default,
+                 * EnableNativeEvents = true,
+                 * EnablePersistentHover = true,
+                 * FileUploadDialogTimeout = TimeSpan.FromSeconds(30),
+                 * ForceCreateProcessApi = true,
+                 * ForceShellWindowsApi = true,
+                 * Proxy = new Proxy(),
+                 * RequireWindowFocus = true,  
+                 * UnhandledPromptBehavior = UnhandledPromptBehavior.Default,
+                 * UsePerProcessProxy = false,
+                 * ***********************************************************/
+            };
+
+            /**************************************************************
+             * IE WebDriver may throw an exception if 'Enable Protected Mode' security setting is not the same for all zones: ON or OFF.
+             *
+             * By setting the OpenQA.Selenium.IE.InternetExplorerOptions.IntroduceInstabilityByIgnoringProtectedModeSettings to true
+             * and InitialBrowserUrl property to a correct URL, you can launch IE in the Internet Protected Mode zone.
+             * This can be helpful to avoid the flakiness introduced by ignoring the Protected Mode settings.
+             * Nevertheless, setting Protected Mode zone settings to the same value in the IE configuration is the preferred method.
+             * ***********************************************************/
+            if (browserSettings.InitialBrowserUrl != null)
+            {
+                ieOptions.InitialBrowserUrl = browserSettings.InitialBrowserUrl;
+                ieOptions.IntroduceInstabilityByIgnoringProtectedModeSettings = browserSettings.IntroduceInstabilityByIgnoringProtectedModeSettings;
             };
 
             // Time (in ms) that time-limited commands are permitted to run.
-            // Default = 0 ms: no  time limit.
-            // Valid values are: "script" for script timeouts, "implicit" for modifying the implicit wait timeout and "page load" for setting a page load timeout.
-            ieOptions.AddAdditionalCapability(CapabilityType.Timeouts, new { @implicit = 0, pageLoad = 300000, script = 0 }, true);
+            var timeouts = new
+            {
+                @implicit = 0,      // No time limit for the implicit wait timeout.
+                pageLoad = 300000,  // 30 s. for the page load timeout.
+                script = 0          // No time limit for script timeouts.
+            };
 
-            //  The IE driver does not support getting logs of any kind.
-            //  Those commands have not been implemented.
-            //  They will be implemented only when the server-side API is properly specified.
+            // NOTE: A warning is logged to the IEDriverServer log b/c by default the "timeouts" capability is set to null.
+            // This code replaces null with a valid object with default timeout values.
+            // These timeouts can be overridden after the WebDriver is created.
+            ieOptions.AddAdditionalCapability(CapabilityType.Timeouts, timeouts, true);
 
             try
             {

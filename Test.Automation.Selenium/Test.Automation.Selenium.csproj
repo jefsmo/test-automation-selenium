@@ -47,14 +47,11 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
-    <Reference Include="Test.Automation.Base, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Test.Automation.Base.1.0.4\lib\net461\Test.Automation.Base.dll</HintPath>
+    <Reference Include="Test.Automation.Base, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Test.Automation.Base.1.0.18\lib\net461\Test.Automation.Base.dll</HintPath>
     </Reference>
     <Reference Include="WebDriver, Version=3.13.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Selenium.WebDriver.3.13.0\lib\net45\WebDriver.dll</HintPath>
-    </Reference>
-    <Reference Include="WebDriver.Support, Version=3.13.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Selenium.Support.3.13.0\lib\net45\WebDriver.Support.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -72,10 +69,14 @@
   <ItemGroup>
     <None Include="app.config.install.xdt" />
     <None Include="App.config.transform" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="README.md" />
     <None Include="README.Selenium.md" />
-    <None Include="Test.Automation.Selenium.nuspec" />
+    <None Include="Test.Automation.Selenium.nuspec">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="selenium-logo.png" />

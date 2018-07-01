@@ -75,14 +75,14 @@ You can update the WebDriver to a current version by copying the new version to 
 Each WebDriver is related to a specific browser.  
 You need a WebDriver for each browser you intend to run tests against.  
 
-The solution includes the following WebDriver projects:  
+The framework includes the following WebDriver projects:  
 
-|Driver|Browser|Project|
+|WebDriver|Browser Name|Project|
 |----|----|----|
 |ChromeDriver|Chrome|Test.Automation.ChromeDriver|
-|Headless Chrome|Chrome in headless mode|Use ChromeDriver <br> set IsHeadless="true"|
+|ChromeDriver|headless chrome|Use ChromeDriver <br> set IsHeadless="true"|
 |IEDriverServer|Internet Explorer|Test.Automation.IEDriverServer|
-|MicrosoftWebDriver|Edge browser|Test.Automation.MicrosoftWebDriver|
+|MicrosoftWebDriver|MicrosoftEdge|Test.Automation.MicrosoftWebDriver|
 
 #### WebDriver Download Links
 **README.WebDriver.md**
@@ -90,7 +90,7 @@ The solution includes the following WebDriver projects:
 |Browser | WebDriver | Download |Notes|
 |-----|-----|-----|----|
 | [Chrome](https://www.google.com/chrome/browser/desktop/index.html?system=true&standalone=1) | chromedriver.exe | [ChromeDriver](https://sites.google.com/a/chromium.org/chromedriver/downloads) | [Wiki](https://github.com/SeleniumHQ/selenium/wiki/ChromeDriver) <br> Use Chrome's 'alternative installer'<br>Recommended for testing Web applications built with moden javascript frameworks like React and Ember |
-| HeadLess Chrome | chromedriver.exe | see above | Headless web testing<br>Set **`IsHeadless="true"`** in App.config |
+| No browser Chrome is headless | chromedriver.exe | see ChromeDriver | Headless web testing<br>**`IsHeadless="true"`** |
 | [Internet Explorer (IE)](https://support.microsoft.com/en-us/help/17621/internet-explorer-downloads) | IEDriverServer.exe | [IEDriverServer](http://selenium-release.storage.googleapis.com/index.html)  | [Required Configuration](https://github.com/SeleniumHQ/selenium/wiki/InternetExplorerDriver#required-configuration) <br> Windows default browser prior to Windows 10 |
 | [Microsoft Edge](https://www.microsoft.com/en-us/windows/microsoft-edge#AoPhgFHFcSwpqU6Z.97) | MicrosoftWebDriver.exe | [MicrosoftWebDriver](https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/)| [WebDriver](https://docs.microsoft.com/en-us/microsoft-edge/webdriver) <br> Windows 10 default browser <br> Will be a Feature on Demand in a future Windows version |
 
@@ -258,7 +258,8 @@ You can use this file as a reference if the original file is deleted or broken.
     IsHeadless                Run the Chrome browser in a headless environment  (Chrome only)[ true | *false] 
     EnableVerboseLogging      Enable DriverService verbose logging.             [ true | *false ] 
     LogLevel                  Level of logging for WebDriver instances.         [ All | Debug | Info | *Warning | Severe | Off ]
-    IntroduceInstabilityByIgnoringProtectedModeSettings Ignore IE Protected Mode settings (IE only) [ true | *false ]
+    IntroduceInstabilityByIgnoringProtectedModeSettings For IE Protected Mode.  (IE only) [ true | *false ]
+    InitialBrowserUrl         Internet Protected Mode zone URL.                 (IE only, requires IntroduceInstabilityByIgnoringProtectedModeSettings=true) [ *null | https://www.bing.com ]
     ===========================================================================
     -->
     <TEST Name="Chrome" />

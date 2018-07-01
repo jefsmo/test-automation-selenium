@@ -1,20 +1,40 @@
 # Test.Automation.Base
+
 **README.md**
+
+Automatically logs test attribute and test context data to the output window.  
+
+|Test Mode|Result|Log to Output|
+|---|---|---|
+|Run|Pass|no|
+|Run|Fail|yes|
+|Debug|Pass|yes|
+|Debug|Fail|yes|
+
+ - In general, logging can add a significant performance penalty to a passing test.
+ - When running hundreds of tests, this can add minutes or hours to a test run.
+ - This framework only logs when tests fail or are run in debug mode.
+
 ## History
 |Date|Notes|
 |---|---|
+|2018-07-01|Bug fixes <br> Update README|
 |2018-02-18|Bug fixes|
 |2017-12-05|Initial Release|
 
 ## Contents
 [NUnit Test Project Workflow](#nunit-test-project-workflow)  
-[Octopack Reference](#octopack-reference)  
 [Viewing Local Packages](#viewing-local-packages)  
+[Octopack Reference](#octopack-reference)  
 [Troubleshooting](#troubleshooting)  
 
 ## NUnit Test Project Workflow
+- Ensure your test class inherits from the base class **`NUnitTestBase`**
+- Ensure you have installed NUnit and NUnit3TestAdapter NuGet packages.
+- If the test is run in debug mode or if the test fails, the output window displays the test log.
+- If the test passes and is not run in debug mode, nothing is logged to the output window.
 
-## Examples
+### Example Tests
 
 ```csharp
 using NUnit.Framework;
@@ -70,7 +90,91 @@ namespace UnitTestProject1
     }
 }
 ```
+### Example Test Output
+#### Fail With Test Attributes
+~~~text
+Test Name:	Fail_WithTestAttributes
+Test Outcome:	Failed
+Result Message:	
+Expected: 41
+  But was:  42
+Result StandardOutput:	
+TEST ATTRIBUTES
+Owner                         	Your Name                          
+Description                   	This test fails and has [Test] attributes.
+Timeout                       	1 (second)                         
+Test Priority                 	High                               
+Test Category                 	Integration, Smoke, Web            
+Test Property                 	[Bug, FOO-42]                      
+Work Item                     	123, 456, 789                      
+================================================================================
+TEST CONTEXT
+Unique ID                     	0-1002                             
+Class Name                    	UnitTestProject1.UnitTest1         
+Method Name                   	Fail_WithTestAttributes            
+Test Name                     	Fail_WithTestAttributes            
+Binaries Dir                  	C:\Source\Repos\test-automation-base\UnitTestProject1\bin\Debug
+Deployment Dir                	C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE
+Logs Dir                      	C:\Source\Repos\test-automation-base\UnitTestProject1\bin\Debug
+================================================================================
+~~~
 
+#### Pass With Test Attributes (In Debug Mode)
+~~~text
+Test Name:	Pass_WithTestAttributes
+Test Outcome:	Passed
+Result StandardOutput:	
+TEST ATTRIBUTES
+Owner                         	Your Name                          
+Description                   	This test passes and has [Test] attributes.
+Timeout                       	Infinite                           
+Test Priority                 	Normal                             
+Test Category                 	UnitTest, Functional, Database     
+Test Property                 	[ID, BAR-42]                       
+Work Item                     	123, 456, 789                      
+================================================================================
+TEST CONTEXT
+Unique ID                     	0-1003                             
+Class Name                    	UnitTestProject1.UnitTest1         
+Method Name                   	Pass_WithTestAttributes            
+Test Name                     	Pass_WithTestAttributes            
+Binaries Dir                  	C:\Source\Repos\test-automation-base\UnitTestProject1\bin\Debug
+Deployment Dir                	C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE
+Logs Dir                      	C:\Source\Repos\test-automation-base\UnitTestProject1\bin\Debug
+================================================================================
+~~~
+
+#### Fail With No Test Attributes
+~~~text
+Test Name:	Fail_NoTestAttributes
+Test Outcome:	Failed
+Result Message:	
+Expected: 4
+  But was:  5
+Result StandardOutput:	
+TEST ATTRIBUTES
+Owner                         	Unknown                            
+Description                   	Unknown                            
+Timeout                       	Infinite                           
+Test Priority                 	Unknown                            
+Test Category                 	Unknown                            
+Test Property                 	[Unknown, Unknown]                 
+Work Item                     	Unknown                            
+================================================================================
+TEST CONTEXT
+Unique ID                     	0-1001                             
+Class Name                    	UnitTestProject1.UnitTest1         
+Method Name                   	Fail_NoTestAttributes              
+Test Name                     	Fail_NoTestAttributes              
+Binaries Dir                  	C:\Source\Repos\test-automation-base\UnitTestProject1\bin\Debug
+Deployment Dir                	C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE
+Logs Dir                      	C:\Source\Repos\test-automation-base\UnitTestProject1\bin\Debug
+================================================================================
+~~~
+
+## Viewing Local Packages
+- Install NuGet Package Explorer to view local packages.  
+- [NuGetPackageExplorer](https://github.com/NuGetPackageExplorer/NuGetPackageExplorer)
 
 ## Octopack Reference
 #### Create a Local NuGet Package with OctoPack
@@ -81,11 +185,10 @@ namespace UnitTestProject1
 - Run the following command:
 #### MSBuild Octopack Command
 
-```
+```text
 MSBUILD Test.Automation.Base.csproj /t:Rebuild /p:Configuration=Release /p:RunOctoPack=true /p:OctoPackPublishPackageToFileShare=C:\Packages /p:OctoPackPackageVersion=1.0.0 /fl
 ```
 #### MSBUILD OctoPack Command Syntax
-
 |Switch|Value|Definition|
 |-----|-----|-----|
 |`/t:Rebuild`|  |MSBUILD Rebuilds the project(s).|
@@ -108,8 +211,5 @@ MSBUILD Test.Automation.Base.csproj /t:Rebuild /p:Configuration=Release /p:RunOc
 |`/p:OctoPackNuGetExePath=`|`C:\MyNuGetPath\`|OctoPack comes with a bundled version of NuGet.exe. Use this parameter to force OctoPack to use a different NuGet.exe instead.|
 |`/p:OctoPackNuSpecFileName=`|`<C#/VB_ProjectName>.nuspec`|The NuSpec file to use.|
 
-## Viewing Local Packages
-- Install NuGet Package Explorer to view local packages.  
-- [NuGetPackageExplorer](https://github.com/NuGetPackageExplorer/NuGetPackageExplorer)
-
 ## Troubleshooting
+TBD
