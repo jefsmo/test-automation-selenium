@@ -2,7 +2,7 @@
 
 **README.md**
 
-## History
+## Release Notes
 |Date|Notes|
 |---|---|
 |2018-06-29|Fix IE bugs by adding 'IntroduceInstabilityByIgnoringProtectedModeSettings' arg |
@@ -23,6 +23,7 @@
 [Debug Mode Output](#debug-mode-output)  
 [Example App.Config File](#example-app.config-file)  
 [TroubleShooting](#troubleshooting)  
+[Viewing Local Packages](#viewing-local-packages)  
 [Creating Packages Locally](#creating-packages-locally)  
 
 ## Test.Automation Projects Overview
@@ -91,7 +92,7 @@ The framework includes the following WebDriver projects:
 |-----|-----|-----|----|
 | [Chrome](https://www.google.com/chrome/browser/desktop/index.html?system=true&standalone=1) | chromedriver.exe | [ChromeDriver](https://sites.google.com/a/chromium.org/chromedriver/downloads) | [Wiki](https://github.com/SeleniumHQ/selenium/wiki/ChromeDriver) <br> Use Chrome's 'alternative installer'<br>Recommended for testing Web applications built with moden javascript frameworks like React and Ember |
 | No browser Chrome is headless | chromedriver.exe | see ChromeDriver | Headless web testing<br>**`IsHeadless="true"`** |
-| [Internet Explorer (IE)](https://support.microsoft.com/en-us/help/17621/internet-explorer-downloads) | IEDriverServer.exe | [IEDriverServer](http://selenium-release.storage.googleapis.com/index.html)  | [Required Configuration](https://github.com/SeleniumHQ/selenium/wiki/InternetExplorerDriver#required-configuration) <br> Windows default browser prior to Windows 10 |
+| [Internet Explorer (IE)](https://support.microsoft.com/en-us/help/17621/internet-explorer-downloads) | IEDriverServer.exe | [IEDriverServer](http://selenium-release.storage.googleapis.com/index.html) <br> IEDriverServer_Win32 | [Required Configuration](https://github.com/SeleniumHQ/selenium/wiki/InternetExplorerDriver#required-configuration) <br> Do not use **x64** <br> Windows default browser prior to Windows 10 |
 | [Microsoft Edge](https://www.microsoft.com/en-us/windows/microsoft-edge#AoPhgFHFcSwpqU6Z.97) | MicrosoftWebDriver.exe | [MicrosoftWebDriver](https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/)| [WebDriver](https://docs.microsoft.com/en-us/microsoft-edge/webdriver) <br> Windows 10 default browser <br> Will be a Feature on Demand in a future Windows version |
 
 ## NUnit Test Framework Workflow
@@ -160,47 +161,49 @@ Test Name:	Bing_Title_ShouldBeBing
 Test Outcome:	Passed
 Result StandardOutput:	
 ENVIRONMENT SETTINGS
-Run Environment          	TEST                          
-Base URI                 	https://www.bing.com/         
+Run Environment               	TEST                               
+Base URI                      	https://www.bing.com/              
 ================================================================================
 WEBDRIVER SERVICE SETTINGS
-Service Name             	OpenQA.Selenium.IE.InternetExplorerDriverService
-Service State            	RUNNING                       
-Service Window           	HIDDEN                        
-Service URI              	http://localhost:5555/        
-Service Port             	5555                          
-Process ID               	10748                         
+Service Name                  	OpenQA.Selenium.Chrome.ChromeDriverService
+IsRunning                     	TRUE                               
+Cmd Window                    	VISIBLE                            
+Service URI                   	http://localhost:9515/             
+Service Port                  	9515                               
+Process ID                    	8388                               
 ================================================================================
-WEBDRIVER BROWSER SETTINGS
-Browser Name             	IE                            
-Browser Window           	NORMAL                        
-Browser Mode             	NORMAL                        
-Browser Size             	{Width=800, Height=600}       
-Browser Position         	{X=10,Y=10}                   
+WEBDRIVER INSTANCE SETTINGS
+Browser Name                  	chrome                             
+Browser Version               	67.0.3396.99                       
+IsHeadless                    	TRUE                               
+IsMaximized                   	TRUE                               
+DwnldDefaultDir               	-NO DATA-                          
+InitialBrowserUrl             	data:                              
+VerboseLogging                	FALSE                              
+LogLevel                      	Info                               
 ================================================================================
-BROWSER STATE
-Browser Caps             	Capabilities [BrowserName=internet explorer, Platform=Any, Version=]
-Browser URL              	https://www.bing.com/         
-Browser Title            	Bing                          
+BROWSER END STATE
+Browser Caps                  	Capabilities [BrowserName=chrome, Platform=Any, Version=67.0.3396.99]
+Browser URL                   	https://www.bing.com/              
+Browser Title                 	Bing                               
 ================================================================================
-WebDriver Logs not available for 'internet explorer' WebDriver; EXCEPTION: Object reference not set to an instance of an object.
 TEST ATTRIBUTES
-Owner                    	Your Name                     
-Description              	Verify page title is 'Bing'.  
-Timeout                  	Infinite                      
-Test Priority            	Unknown                       
-Test Category            	Web                           
-Test Property            	[Some Other Property, foo bar]
-Work Item                	12345                         
+Owner                         	Your Name                          
+Description                   	Verify page title is 'Bing'.       
+Timeout                       	Infinite                           
+Test Priority                 	Unknown                            
+Test Category                 	Web                                
+Test Property                 	[Some Other Property, foo bar]     
+Work Item                     	12345                              
 ================================================================================
 TEST CONTEXT
-Unique ID                	0-1002                        
-Class Name               	UnitTestProject1.UnitTest1    
-Method Name              	Bing_Title_ShouldBeBing       
-Test Name                	Bing_Title_ShouldBeBing       
-Binaries Dir             	C:\Source\Repos\test-automation-selenium\UnitTestProject1\bin\Debug
-Deployment Dir           	C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE
-Logs Dir                 	C:\Source\Repos\test-automation-selenium\UnitTestProject1\bin\Debug
+Unique ID                     	0-1002                             
+Class Name                    	UnitTestProject1.UnitTest1         
+Method Name                   	Bing_Title_ShouldBeBing            
+Test Name                     	Bing_Title_ShouldBeBing            
+Binaries Dir                  	C:\Source\Repos\test-automation-selenium\UnitTestProject1\bin\Debug
+Deployment Dir                	C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE
+Logs Dir                      	C:\Source\Repos\test-automation-selenium\UnitTestProject1\bin\Debug
 ================================================================================
 ~~~
 
@@ -247,19 +250,25 @@ You can use this file as a reference if the original file is deleted or broken.
 
   <browserSettings>
     <!--
-    *-Denotes default value. Settings are optional unless noted otherwise.
-    Name                      WebDriver browser name.                           [ *Chrome | IE | MicrosoftEdge ]
-    Position                  Browser window position. (from upper left corner) [ *(10, 10) ]
-    Size                      Browser window size. (width, height)              [ *(1600, 900) ] 
-    IsMaximized               Maximize browser window. (overrides window size)  [ true | *false ]
-    HideCommandPromptWindow   Hide WebDriver service command window.            [ *true | false ] 
-    DefaultWaitTimeout        Default WebDriver Wait timeout value. (seconds)   [ *3 ]
-    DownloadDefaultDir        Default Chrome download directory                 (Chrome only)
-    IsHeadless                Run the Chrome browser in a headless environment  (Chrome only)[ true | *false] 
-    EnableVerboseLogging      Enable DriverService verbose logging.             [ true | *false ] 
-    LogLevel                  Level of logging for WebDriver instances.         [ All | Debug | Info | *Warning | Severe | Off ]
-    IntroduceInstabilityByIgnoringProtectedModeSettings For IE Protected Mode.  (IE only) [ true | *false ]
-    InitialBrowserUrl         Internet Protected Mode zone URL.                 (IE only, requires IntroduceInstabilityByIgnoringProtectedModeSettings=true) [ *null | https://www.bing.com ]
+    All SETTINGS OPTIONAL (unless noted otherwise.)
+    *-Denotes default value. 
+    === ALL BROWSERS ==========================================================
+    Name                        WebDriver browser name.                            [ *Chrome | IE | MicrosoftEdge ]
+    HideCommandPromptWindow     Hide command prompt window of the service.         [ *true | false ]
+    InitialBrowserUrl           URL browser will be navigated to on launch.        [ *null | (https://www.bing.com) ]
+    DefaultWaitTimeout          Default WebDriver Wait timeout value. (seconds)    [ *3 ]
+    PageLoadStrategy            Specifies the behavior of waiting for page loads.  [ Default | *Normal | Eager | None ]
+    IsMaximized                 Maximize browser window. (overrides size/position) [ true | *false ]
+    Size                        Browser window size. (width, height)               [ *(1600, 900) ]
+    Position                    Browser window position. (from upper left corner)  [ *(10, 10) ]
+    EnableVerboseLogging        Enable DriverService verbose logging.              [ true | *false ]
+    LogLevel                    Level of logging for WebDriver instance logs.      [ All | Debug | Info | *Warning | Severe | Off ]
+    === CHROME ONLY ===         ===============================================
+    IsHeadless                  Run Chrome browser in a headless environment.      [ true | *false] 
+    DownloadDefaultDir          Default Chrome download directory.                 [ *null | (C:\MyDownloadDefaultDir) ]
+    === INTERNET EXPLORER ONLY  ===============================================
+    EnsureCleanSession          Clear the IE cache before launching the browser.   [ true | *false]
+    IgnoreProtectedModeSettings Ignore mixed IE Protected Mode zone settings.      [ true | *false ]
     ===========================================================================
     -->
     <TEST Name="Chrome" />
@@ -271,7 +280,24 @@ You can use this file as a reference if the original file is deleted or broken.
 ```
 
 ## TroubleShooting
-#### No MicrosoftWebDriver logs
+#### The WebDriver Does Not Start or Crashes
+- Open a command prompt
+- Navigate to the test project bin/debug folder
+- Run the webdriver from the command prompt
+~~~text
+C:\Source\Repos\test-automation-selenium\UnitTestProject1\bin\Debug>chromedriver.exe -verbose
+Starting ChromeDriver 2.40.565498 (ea082db3280dd6843ebfb08a625e3eb905c4f5ab) on port 9515
+Only local connections are allowed.
+~~~
+- If it does not start or crashes uninstall and re-install the WebDriver
+- Open a second command prompt and try running the test binaries outside of VS
+- Install the latest version of the WebDriver
+- Install the latest version of the Browser:
+  - For Chrome: uninstall Chrome browser and re-install using the [alternate installer](http://www.google.com/chrome/eula.html?system=true&standalone=1)
+  - This will install Chrome for all users. 
+  - This often fixes problems if you are running Selenium as a background service.
+
+#### MicrosoftWebDriver Does Not Have Logging
 ~~~text
 UPDATE: Console logging will be supported in a future version of Microsoft Web Driver.
 [Platform Status](https://developer.microsoft.com/en-us/microsoft-edge/platform/status/consoleloggingapis/?q=log)  
@@ -279,12 +305,16 @@ UPDATE: Console logging will be supported in a future version of Microsoft Web D
 First, the JsonWireProtocol as defined by SeleniumHQ is deprecated.
 It was in this protocol specification that the logging capabilities for the WebDriver session were defined.
 
-“Status: OBSOLETE See current W3C specification for WebDriver”
+Status: OBSOLETE See current W3C specification for WebDriver
 
 The current WebDriver Recommendation does not have logging capabilities defined.
 I do not know why these were dropped.
 Perhaps these logs were thought best collected at each source?
 ~~~
+
+## Viewing Local Packages
+- Install NuGet Package Explorer to view local packages.  
+- [NuGetPackageExplorer](https://github.com/NuGetPackageExplorer/NuGetPackageExplorer)
 
 ## Creating Packages Locally
 ### OctoPack Command Line Reference
@@ -325,10 +355,6 @@ MSBUILD Test.Automation.Selenium.csproj /t:Rebuild /p:Configuration=Release /p:R
 |`/p:OctoPackNuGetArguments=`| `-Verbosity detailed`|Use this parameter to specify additional command line parameters that will be passed to NuGet.exe pack.|
 |`/p:OctoPackNuGetExePath=`|`C:\MyNuGetPath\`|OctoPack comes with a bundled version of NuGet.exe. Use this parameter to force OctoPack to use a different NuGet.exe instead.|
 |`/p:OctoPackNuSpecFileName=`|`<C#/VB_ProjectName>.nuspec`|The NuSpec file to use.|
-
-### Viewing Local Packages
-- Install NuGet Package Explorer to view local packages.  
-- [NuGetPackageExplorer](https://github.com/NuGetPackageExplorer/NuGetPackageExplorer)
 
 ### NuGet Command Line Reference
 Ensure that NuGet.exe is in your path.  

@@ -6,13 +6,13 @@ using OpenQA.Selenium;
 namespace Test.Automation.Selenium.Settings
 {
     /// <summary>
-    /// Represents the App.config BrowserSettings data.
+    /// Represents App.config BrowserSettings values for WebDriver browsers.
     /// </summary>
     public sealed class BrowserSettings : ConfigurationSection
     {
         /// <summary>
         /// Gets the WebDriver browser name.
-        /// Default = Chrome.
+        /// Default = DriverType.Chrome.
         /// </summary>
         [ConfigurationProperty("Name", IsRequired = false, DefaultValue = "Chrome")]
         [TypeConverter(typeof(CustomDriverTypeConverter))]
@@ -20,7 +20,7 @@ namespace Test.Automation.Selenium.Settings
 
         /// <summary>
         /// Gets the WebDriver browser starting window position.
-        /// Default = 10, 10.
+        /// Default = "10, 10".
         /// </summary>
         [ConfigurationProperty("Position", IsRequired = false, DefaultValue = "10, 10")]
         [TypeConverter(typeof(CustomPointConverter))]
@@ -28,7 +28,7 @@ namespace Test.Automation.Selenium.Settings
 
         /// <summary>
         /// Gets the WebDriver browser starting window size. 
-        /// Default = 1600, 900.
+        /// Default = "1600, 900".
         /// </summary>
         [ConfigurationProperty("Size", IsRequired = false, DefaultValue = "1600, 900")]
         [TypeConverter(typeof(CustomSizeConverter))]
@@ -58,17 +58,27 @@ namespace Test.Automation.Selenium.Settings
         public double DefaultWaitTimeout => (double) this["DefaultWaitTimeout"];
 
         /// <summary>
-        /// Gets a default Chrome browser download directory. (Chrome only.)
-        /// </summary>
-        [ConfigurationProperty("DownloadDefaultDir", IsRequired = false)]
-        public string DownloadDefaultDir => (string)this["DownloadDefaultDir"];
-
-        /// <summary>
-        /// Gets the setting for running Chrome in a headless environment. (Chrome only.)
+        /// Gets the setting for whether to delete all cookies from the page.
         /// Default = false.
         /// </summary>
-        [ConfigurationProperty("IsHeadless", IsRequired = false, DefaultValue = false)]
-        public bool IsHeadless => (bool)this["IsHeadless"];
+        [ConfigurationProperty("DeleteAllCookies", IsRequired = false, DefaultValue = false)]
+        public bool DeleteAllCookies => (bool)this["DeleteAllCookies"];
+
+        /// <summary>
+        /// Gets the setting for the URL of the page the browser will be navigated to on launch.
+        /// Default = null.
+        /// If not set, the browser launches with the internal startup page for the WebDriver.
+        /// </summary>
+        /// <remarks>
+        /// Additional information when using IE:
+        /// If not set, the browser launches with the internal startup page for the WebDriver server.
+        /// By setting the OpenQA.Selenium.IE.InternetExplorerOptions.IntroduceInstabilityByIgnoringProtectedModeSettings to true
+        /// and this property to a correct URL, you can launch IE in the Internet Protected Mode zone.
+        /// This can be helpful to avoid the flakiness introduced by ignoring the Protected Mode settings.
+        /// Nevertheless, setting Protected Mode zone settings to the same value in the IE configuration is the preferred method.
+        /// </remarks>
+        [ConfigurationProperty("InitialBrowserUrl", IsRequired = false, DefaultValue = null)]
+        public string InitialBrowserUrl => (string)this["InitialBrowserUrl"];
 
         /// <summary>
         /// Gets the EnableVerboseLogging setting for DriverService logging.
@@ -84,26 +94,52 @@ namespace Test.Automation.Selenium.Settings
         /// [ All | Debug | Info | *Warning | Severe | Off ]
         /// </summary>
         [ConfigurationProperty("LogLevel", IsRequired = false, DefaultValue = LogLevel.Warning)]
+        [TypeConverter(typeof(CustomLogLevelConverter))]
         public LogLevel LogLevel => (LogLevel)this["LogLevel"];
 
         /// <summary>
-        /// Gets or sets a value indicating whether to ignore the settings of the Internet Explorer Protected Mode.
-        /// Default = false.
-        /// Use to fix exception when IE 'Enable Protected Mode' is not checked/un-checked for all zones.
+        /// Get the PageLoadStategy for specifying the behavior of waiting for page loads in the driver.
+        /// [ Default | *Normal | Eager | None ]
+        /// Default = PageLoadStrategy.Normal.
         /// </summary>
-        [ConfigurationProperty("IntroduceInstabilityByIgnoringProtectedModeSettings", IsRequired = false, DefaultValue = false)]
-        public bool IntroduceInstabilityByIgnoringProtectedModeSettings => (bool)this["IntroduceInstabilityByIgnoringProtectedModeSettings"];
+        [ConfigurationProperty("PageLoadStrategy", IsRequired = false, DefaultValue = PageLoadStrategy.Normal)]
+        [TypeConverter(typeof(CustomPageLoadStrategyConverter))]
+        public PageLoadStrategy PageLoadStrategy => (PageLoadStrategy)this["PageLoadStrategy"];
+        
+        /**********************************************************************
+         * CHROME ONLY.
+         * *******************************************************************/
+        /// <summary>
+        /// Gets the setting for running Chrome in a headless environment. (Chrome only.)
+        /// Default = false.
+        /// </summary>
+        [ConfigurationProperty("IsHeadless", IsRequired = false, DefaultValue = false)]
+        public bool IsHeadless => (bool)this["IsHeadless"];
 
         /// <summary>
-        /// Gets or sets the initial URL displayed when IE is launched.
+        /// Gets a default Chrome browser download directory. (Chrome only.)
         /// Default = null.
-        /// If not set, the browser launches with the internal startup page for the WebDriver server.
-        /// By setting the OpenQA.Selenium.IE.InternetExplorerOptions.IntroduceInstabilityByIgnoringProtectedModeSettings to true
-        /// and this property to a correct URL, you can launch IE in the Internet Protected Mode zone.
-        /// This can be helpful to avoid the flakiness introduced by ignoring the Protected Mode settings.
-        /// Nevertheless, setting Protected Mode zone settings to the same value in the IE configuration is the preferred method.
         /// </summary>
-        [ConfigurationProperty("InitialBrowserUrl", IsRequired = false, DefaultValue = null)]
-        public string InitialBrowserUrl => (string)this["InitialBrowserUrl"];
+        [ConfigurationProperty("DownloadDefaultDir", IsRequired = false, DefaultValue = null)]
+        public string DownloadDefaultDir => (string)this["DownloadDefaultDir"];
+
+        /**********************************************************************
+         * INTERNET EXPLORER ONLY.
+         * *******************************************************************/
+        /// <summary>
+        /// Gets the setting for whether to clear the Internet Explorer cache before launching the browser. (IE only.)
+        /// Default = false.
+        /// Setting this to true may delay browser loading.
+        /// </summary>
+        [ConfigurationProperty("EnsureCleanSession", IsRequired = false, DefaultValue = false)]
+        public bool EnsureCleanSession => (bool)this["EnsureCleanSession"];
+
+        /// <summary>
+        /// ADVANCED: Gets or sets a value indicating whether to ignore the settings of the Internet Explorer Protected Mode. (IE only.)
+        /// Default = false.
+        /// Use to fix exception when IE has mixed 'Enable Protected Mode' settings for all zones.
+        /// </summary>
+        [ConfigurationProperty("IgnoreProtectedModeSettings", IsRequired = false, DefaultValue = false)]
+        public bool IgnoreProtectedModeSettings => (bool)this["IgnoreProtectedModeSettings"];
     }
 }

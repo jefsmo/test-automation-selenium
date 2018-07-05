@@ -49,7 +49,9 @@ namespace Test.Automation.Selenium.Settings
         {
             ValidateType(value, typeof(DriverType));
 
-            return value.ToString();
+            var data = ((DriverType)value);
+
+            return data.ToString();
         }
 
         /// <summary>

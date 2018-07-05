@@ -104,16 +104,15 @@ namespace Test.Automation.Selenium
         {
             if (!DriverService.IsRunning)
             {
+                // DriverService should be started in StartTestRun().
                 throw new ApplicationException($"The DriverService '{DriverService}' is not running.");
             }
 
-            if (BrowserSettings == null)
-            {
-                throw new ApplicationException("No '<browserSettings>' section found in App.config file.\r\nEnsure the App.config file exists and it contains a '<browserSettings>' section.");
-            }
-
             Driver = WebDriverFactory.CreateWebDriver(BrowserSettings, DriverService);
-            Driver.Manage().Cookies.DeleteAllCookies();
+            if (BrowserSettings.DeleteAllCookies)
+            {
+                Driver.Manage().Cookies.DeleteAllCookies();
+            }
             SetBrowserWindow();
         }
 
@@ -167,14 +166,15 @@ namespace Test.Automation.Selenium
             {
                 {"Service Name", DriverService.ToString() },
                 {"IsRunning", DriverService.IsRunning.ToString().ToUpperInvariant() },
-                {"CmdPrmptWindow", DriverService.HideCommandPromptWindow
+                {"Cmd Window", DriverService.HideCommandPromptWindow
                 ? "HIDDEN"
                 : "VISIBLE" },
                 {"Service URI", DriverService.ServiceUrl.AbsoluteUri },
+                {"Service Host", DriverService.HostName },
                 {"Service Port", DriverService.Port.ToString() },
                 {"Process ID", DriverService.ProcessId.ToString() },
             };
-            WriteLogToOutput("WebDriver Service Settings", webDriver);
+            WriteLogToOutput("WebDriver Service State", webDriver);
         }
 
         private void LogWebDriverBrowserState()
@@ -182,69 +182,119 @@ namespace Test.Automation.Selenium
 
             var browser = new Dictionary<string, string>
             {
-                {"Browser Name", Driver.Capabilities.BrowserName.ToString() },
-                {"IsMaximized", BrowserSettings.IsMaximized.ToString().ToUpperInvariant()},
+                {"Browser Setting", BrowserSettings.Name.ToString() },
+                {"Browser Name", Driver?.Capabilities.BrowserName.ToString() },
+                {"Browser Version", Driver?.Capabilities.Version == string.Empty
+                ? "-NO DATA-"
+                : Driver?.Capabilities.Version},
+                {"DefaultTimeout", BrowserSettings.DefaultWaitTimeout.ToString() + " s." }
             };
-
-            if (!BrowserSettings.IsMaximized)
-            {
-                browser.Add("Browser Size", BrowserSettings.Size.ToString());
-                browser.Add("Browser Position", BrowserSettings.Position.ToString());
-            }
 
             // Browser specific settings.
             switch (BrowserSettings.Name)
             {
                 case DriverType.IE:
-                    browser.Add("VerboseLogging", BrowserSettings.EnableVerboseLogging.ToString().ToUpperInvariant());
                     browser.Add("InitialBrowserUrl", BrowserSettings.InitialBrowserUrl == string.Empty
                         ? "Default initial start page for the WebDriver server."
                         : BrowserSettings.InitialBrowserUrl);
-                    browser.Add("IgnoreProtectedMode", BrowserSettings.IntroduceInstabilityByIgnoringProtectedModeSettings.ToString().ToUpperInvariant());
+                    browser.Add("IgnoreProtectedMode", BrowserSettings.IgnoreProtectedModeSettings.ToString().ToUpperInvariant());
+                    browser.Add("EnsureCleanSession", BrowserSettings.EnsureCleanSession.ToString().ToUpperInvariant());
+                    if (BrowserSettings.IsMaximized)
+                    {
+                        browser.Add("IsMaximized", BrowserSettings.IsMaximized.ToString().ToUpperInvariant());
+                    }
+                    else
+                    {
+                        browser.Add("Browser Size", BrowserSettings.Size.ToString());
+                        browser.Add("Browser Position", BrowserSettings.Position.ToString());
+                    }
+                    browser.Add("VerboseLogging", BrowserSettings.EnableVerboseLogging.ToString().ToUpperInvariant());
                     break;
                 case DriverType.Chrome:
-                    browser.Add("VerboseLogging", BrowserSettings.EnableVerboseLogging.ToString().ToUpperInvariant());
-                    browser.Add("InitialBrowserUrl", "data:");
+                    browser.Add("InitialBrowserUrl", BrowserSettings.InitialBrowserUrl == string.Empty
+                        ? "data:,"
+                        : BrowserSettings.InitialBrowserUrl);
                     browser.Add("IsHeadless", BrowserSettings.IsHeadless.ToString().ToUpperInvariant());
+                    if (!BrowserSettings.IsHeadless)
+                    {
+                        if (BrowserSettings.IsMaximized)
+                        {
+                            browser.Add("IsMaximized", BrowserSettings.IsMaximized.ToString().ToUpperInvariant());
+                        }
+                        else
+                        {
+                            browser.Add("Browser Size", BrowserSettings.Size.ToString());
+                            browser.Add("Browser Position", BrowserSettings.Position.ToString());
+                        }
+                    }
+                    else
+                    {
+                        // Force start-maximized in headless mode.
+                        browser.Add("IsMaximized", "TRUE");
+                    }
                     browser.Add("DwnldDefaultDir", BrowserSettings.DownloadDefaultDir == string.Empty
-                        ? "NOT SET"
+                        ? "-NO DATA-"
                         : BrowserSettings.DownloadDefaultDir);
-                    browser.Add("LogLevel", BrowserSettings.LogLevel.ToString().ToUpperInvariant());
+                    browser.Add("VerboseLogging", BrowserSettings.EnableVerboseLogging.ToString().ToUpperInvariant());
+                    browser.Add("LogLevel", BrowserSettings.LogLevel.ToString());
                     break;
                 case DriverType.MicrosoftEdge:
-                    browser.Add("InitialBrowserUrl", "about:blank");
+                    browser.Add("InitialBrowserUrl", BrowserSettings.InitialBrowserUrl == string.Empty
+                        ? "about:blank"
+                        : BrowserSettings.InitialBrowserUrl);
+                    if (BrowserSettings.IsMaximized)
+                    {
+                        browser.Add("IsMaximized", BrowserSettings.IsMaximized.ToString().ToUpperInvariant());
+                    }
+                    else
+                    {
+                        browser.Add("Browser Size", BrowserSettings.Size.ToString());
+                        browser.Add("Browser Position", BrowserSettings.Position.ToString());
+                    }
+                    browser.Add("VerboseLogging", BrowserSettings.EnableVerboseLogging.ToString().ToUpperInvariant());
                     break;
                 default:
-                    throw new ArgumentException($"Invalid browser setting name '{BrowserSettings.Name}'.");
+                    throw new ArgumentOutOfRangeException(nameof(BrowserSettings.Name), BrowserSettings.Name, "Invalid argument for browser name - does not match DriverType.");
             }
 
             WriteLogToOutput("WebDriver Instance Settings", browser);
-            
-            if (Driver == null) return;
 
             var browserState = new Dictionary<string, string>
             {
-                {"Browser Caps", ((IHasCapabilities) Driver).Capabilities.ToString()},
-                {"Browser URL", Driver.Url},
-                {"Browser Title", Driver.Title}
+                {"Browser Caps", ((IHasCapabilities) Driver)?.Capabilities.ToString()},
+                {"Browser URL", Driver?.Url},
+                {"Browser Title", Driver?.Title}
             };
 
-            WriteLogToOutput("Browser State", browserState);
+            WriteLogToOutput("Browser End State", browserState);
         }
 
         private void LogWebDriverLogs()
         {
-            // The IE driver does not support getting logs of any kind.
-            // Those commands have not been implemented.
-            // They will be implemented only when the server-side API is properly specified.
-            // The MicrosoftEdge driver throws an 'Unknown Command' exception.
-            if (
-                Driver == null
-                || Driver.Capabilities.BrowserName == "internet explorer"
-                || Driver.Capabilities.BrowserName == "MicrosoftEdge"
-                )
+            if (Driver == null)
             {
                 return;
+            }
+
+            switch (Driver.Capabilities.BrowserName)
+            {
+                /******************************************************************
+                 * The IE driver does not support getting logs of any kind.
+                 * Those commands have not been implemented.
+                 * They will be implemented only when the server-side API is properly specified.
+                 *
+                 * The MicrosoftEdge driver throws an 'Unknown Command' exception.
+                 * ***************************************************************/
+
+                case "internet explorer":
+                case "MicrosoftEdge":
+                    if(Debugger.IsAttached)
+                    {
+                        Console.WriteLine($"WebDriver instance logs not available for: '{Driver.Capabilities.BrowserName}'.");
+                    }
+                    return;
+                default:
+                    break;
             }
 
             var logTypes = default(IEnumerable<string>);
@@ -256,11 +306,8 @@ namespace Test.Automation.Selenium
             }
             catch (Exception ex)
             {
-                if (Debugger.IsAttached)
-                {
-                    // Trap any exceptions if the webdriver does not support instance logs.
-                    Console.WriteLine($"WebDriver Logs not available for '{Driver.Capabilities.BrowserName}' WebDriver; EXCEPTION: {ex.Message}");
-                }
+                // Trap any exceptions if the webdriver does not support instance logs.
+                Console.WriteLine($"WebDriver instance logs not available for: '{Driver.Capabilities.BrowserName}'; EXCEPTION: {ex.Message}");
                 return;
             }
 
@@ -296,16 +343,16 @@ namespace Test.Automation.Selenium
             switch (BrowserSettings.Name)
             {
                 case DriverType.Chrome:
-                    RenameServiceLog("chromedriver");
+                    RenameServiceLog(DriverType.Chrome.ToDescription());
                     break;
                 case DriverType.IE:
-                    RenameServiceLog("IEDriverServer");
+                    RenameServiceLog(DriverType.IE.ToDescription());
                     break;
                 case DriverType.MicrosoftEdge:
-                    RenameServiceLog("MicrosoftEdge");
+                    RenameServiceLog(DriverType.MicrosoftEdge.ToDescription());
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(BrowserSettings.Name), (int)BrowserSettings.Name, null);
+                    throw new ArgumentOutOfRangeException(nameof(BrowserSettings.Name), BrowserSettings.Name, "Invalid argument for browser name - does not match DriverType.");
             }
         }
 
@@ -320,7 +367,7 @@ namespace Test.Automation.Selenium
             {
                 if (Debugger.IsAttached)
                 {
-                    Console.WriteLine($"No driver service log found for '{browserName}.log' in the test dir '{TestContext.CurrentContext.TestDirectory}'.");
+                    Console.WriteLine($"DriverService log not available for: '{browserName}'.");
                 }
                 return;
             }
@@ -418,22 +465,28 @@ namespace Test.Automation.Selenium
 
         private void SetBrowserWindow()
         {
+            // BUG: Chrome headless mode does not support Driver.Manage().Window.
+            if (BrowserSettings.Name == DriverType.Chrome && BrowserSettings.IsHeadless)
+            {
+                return;
+            }
+            
             var currentWindow = Driver.Manage().Window;
 
             if (BrowserSettings.IsMaximized)
             {
-                Driver.Manage().Window.Maximize();
+                currentWindow.Maximize();
             }
             else
             {
                 if (!currentWindow.Position.Equals(BrowserSettings.Position))
                 {
-                    Driver.Manage().Window.Position = BrowserSettings.Position;
+                    currentWindow.Position = BrowserSettings.Position;
                 }
 
                 if (!currentWindow.Size.Equals(BrowserSettings.Size))
                 {
-                    Driver.Manage().Window.Size = BrowserSettings.Size;
+                    currentWindow.Size = BrowserSettings.Size;
                 }
             }
         }

@@ -8,21 +8,21 @@ namespace Test.Automation.Selenium
     public enum DriverType
     {
         /// <summary>
-        /// Chrome.
+        /// Chrome = chromedriver.exe
         /// </summary>
-        [Description("Chrome")]
+        [Description("chromedriver.exe")]
         Chrome,
 
         /// <summary>
-        /// Internet Explorer.
+        /// Internet Explorer = IEDriverServer.exe
         /// </summary>
-        [Description("Internet Explorer")]
+        [Description("IEDriverServer.exe")]
         IE,
 
         /// <summary>
-        /// MicrosoftEdge.
+        /// MicrosoftEdge = MicrosoftWebDriver.exe
         /// </summary>
-        [Description("MicrosoftEdge")]
+        [Description("MicrosoftWebDriver.exe")]
         MicrosoftEdge
     }
 }
