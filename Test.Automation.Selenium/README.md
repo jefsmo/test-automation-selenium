@@ -12,11 +12,11 @@ Automatically logs test attribute and test context data to the output window.
 |Debug|Fail|yes|
 
  - In general, logging can add a significant performance penalty to a passing test.
- - When running hundreds of tests, this can add minutes or hours to a test run.
+ - When a test suite contains hundreds of tests, this can add minutes or hours to the test run.
  - This framework only logs when tests fail or are run in debug mode.
 
-## History
-|Date|Notes|
+## Release Notes
+|Date|Description|
 |---|---|
 |2018-07-01|Bug fixes <br> Update README|
 |2018-02-18|Bug fixes|
@@ -100,23 +100,28 @@ Expected: 41
   But was:  42
 Result StandardOutput:	
 TEST ATTRIBUTES
-Owner                         	Your Name                          
-Description                   	This test fails and has [Test] attributes.
-Timeout                       	1 (second)                         
-Test Priority                 	High                               
-Test Category                 	Integration, Smoke, Web            
-Test Property                 	[Bug, FOO-42]                      
-Work Item                     	123, 456, 789                      
+{
+  "Owner": "Your Name",
+  "Description": "This test fails and has [Test] attributes.",
+  "Timeout": "6,000 (ms)",
+  "Priority": "High",
+  "TestCategory": "Integration, Smoke, Web",
+  "TestProperty": "[Bug, FOO-42]",
+  "WorkItem": "123, 456, 789"
+}
 ================================================================================
 TEST CONTEXT
-Unique ID                     	0-1002                             
-Class Name                    	UnitTestProject1.UnitTest1         
-Method Name                   	Fail_WithTestAttributes            
-Test Name                     	Fail_WithTestAttributes            
-Binaries Dir                  	C:\Source\Repos\test-automation-base\UnitTestProject1\bin\Debug
-Deployment Dir                	C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE
-Logs Dir                      	C:\Source\Repos\test-automation-base\UnitTestProject1\bin\Debug
+{
+  "Id": "0-1002",
+  "ClassName": "UnitTestProject1.UnitTest1",
+  "MethodName": "Fail_WithTestAttributes",
+  "TestName": "Fail_WithTestAttributes",
+  "TestBinariesDirectory": "C:\\Source\\Repos\\test-automation-base\\UnitTestProject1\\bin\\Debug",
+  "CurrentDirectory": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\IDE",
+  "LogDirectory": "C:\\Source\\Repos\\test-automation-base\\UnitTestProject1\\bin\\Debug"
+}
 ================================================================================
+
 ~~~
 
 #### Pass With Test Attributes (In Debug Mode)
@@ -125,23 +130,28 @@ Test Name:	Pass_WithTestAttributes
 Test Outcome:	Passed
 Result StandardOutput:	
 TEST ATTRIBUTES
-Owner                         	Your Name                          
-Description                   	This test passes and has [Test] attributes.
-Timeout                       	Infinite                           
-Test Priority                 	Normal                             
-Test Category                 	UnitTest, Functional, Database     
-Test Property                 	[ID, BAR-42]                       
-Work Item                     	123, 456, 789                      
+{
+  "Owner": "Your Name",
+  "Description": "This test passes and has [Test] attributes.",
+  "Timeout": "Infinite",
+  "Priority": "Normal",
+  "TestCategory": "UnitTest, Functional, Database",
+  "TestProperty": "[ID, BAR-42]",
+  "WorkItem": "123, 456, 789"
+}
 ================================================================================
 TEST CONTEXT
-Unique ID                     	0-1003                             
-Class Name                    	UnitTestProject1.UnitTest1         
-Method Name                   	Pass_WithTestAttributes            
-Test Name                     	Pass_WithTestAttributes            
-Binaries Dir                  	C:\Source\Repos\test-automation-base\UnitTestProject1\bin\Debug
-Deployment Dir                	C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE
-Logs Dir                      	C:\Source\Repos\test-automation-base\UnitTestProject1\bin\Debug
+{
+  "Id": "0-1003",
+  "ClassName": "UnitTestProject1.UnitTest1",
+  "MethodName": "Pass_WithTestAttributes",
+  "TestName": "Pass_WithTestAttributes",
+  "TestBinariesDirectory": "C:\\Source\\Repos\\test-automation-base\\UnitTestProject1\\bin\\Debug",
+  "CurrentDirectory": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\IDE",
+  "LogDirectory": "C:\\Source\\Repos\\test-automation-base\\UnitTestProject1\\bin\\Debug"
+}
 ================================================================================
+
 ~~~
 
 #### Fail With No Test Attributes
@@ -153,23 +163,28 @@ Expected: 4
   But was:  5
 Result StandardOutput:	
 TEST ATTRIBUTES
-Owner                         	Unknown                            
-Description                   	Unknown                            
-Timeout                       	Infinite                           
-Test Priority                 	Unknown                            
-Test Category                 	Unknown                            
-Test Property                 	[Unknown, Unknown]                 
-Work Item                     	Unknown                            
+{
+  "Owner": "Unknown",
+  "Description": "Unknown",
+  "Timeout": "Infinite",
+  "Priority": "Unknown",
+  "TestCategory": "Unknown",
+  "TestProperty": "[Unknown, Unknown]",
+  "WorkItem": "Unknown"
+}
 ================================================================================
 TEST CONTEXT
-Unique ID                     	0-1001                             
-Class Name                    	UnitTestProject1.UnitTest1         
-Method Name                   	Fail_NoTestAttributes              
-Test Name                     	Fail_NoTestAttributes              
-Binaries Dir                  	C:\Source\Repos\test-automation-base\UnitTestProject1\bin\Debug
-Deployment Dir                	C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE
-Logs Dir                      	C:\Source\Repos\test-automation-base\UnitTestProject1\bin\Debug
+{
+  "Id": "0-1001",
+  "ClassName": "UnitTestProject1.UnitTest1",
+  "MethodName": "Fail_NoTestAttributes",
+  "TestName": "Fail_NoTestAttributes",
+  "TestBinariesDirectory": "C:\\Source\\Repos\\test-automation-base\\UnitTestProject1\\bin\\Debug",
+  "CurrentDirectory": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\IDE",
+  "LogDirectory": "C:\\Source\\Repos\\test-automation-base\\UnitTestProject1\\bin\\Debug"
+}
 ================================================================================
+
 ~~~
 
 ## Viewing Local Packages

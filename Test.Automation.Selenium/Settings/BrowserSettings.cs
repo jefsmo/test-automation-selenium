@@ -14,55 +14,29 @@ namespace Test.Automation.Selenium.Settings
         /// Gets the WebDriver browser name.
         /// Default = DriverType.Chrome.
         /// </summary>
-        [ConfigurationProperty("Name", IsRequired = false, DefaultValue = "Chrome")]
+        [ConfigurationProperty("Name", IsRequired = false, DefaultValue = DriverType.Chrome)]
         [TypeConverter(typeof(CustomDriverTypeConverter))]
         public DriverType Name => (DriverType)this["Name"];
 
-        /// <summary>
-        /// Gets the WebDriver browser starting window position.
-        /// Default = "10, 10".
-        /// </summary>
-        [ConfigurationProperty("Position", IsRequired = false, DefaultValue = "10, 10")]
-        [TypeConverter(typeof(CustomPointConverter))]
-        public Point Position => (Point)this["Position"];
+        #region DRIVERSERVICE SETTINGS
 
         /// <summary>
-        /// Gets the WebDriver browser starting window size. 
-        /// Default = "1600, 900".
-        /// </summary>
-        [ConfigurationProperty("Size", IsRequired = false, DefaultValue = "1600, 900")]
-        [TypeConverter(typeof(CustomSizeConverter))]
-        public Size Size => (Size)this["Size"];
-
-        /// <summary>
-        /// Gets browser window IsMaximized status.
-        /// This setting overrides WindowPosition and WindowSize settings.
+        /// Gets the setting for whether to hide the DriverService command prompt window.
         /// Default = false.
         /// </summary>
-        [ConfigurationProperty("IsMaximized", IsRequired = false, DefaultValue = false)]
-        public bool IsMaximized => (bool)this["IsMaximized"];
-
-        /// <summary>
-        /// Gets WebDriver service HideCommandPromptWindow status.
-        /// Default = true.
-        /// </summary>
-        [ConfigurationProperty("HideCommandPromptWindow", IsRequired = false, DefaultValue = true)]
+        [ConfigurationProperty("HideCommandPromptWindow", IsRequired = false, DefaultValue = false)]
         public bool HideCommandPromptWindow => (bool)this["HideCommandPromptWindow"];
 
         /// <summary>
-        /// Gets a custom WebDriver Wait timeout value.
-        /// Default = 3D (double).
-        /// </summary>
-        [ConfigurationProperty("DefaultWaitTimeout", IsRequired = false, DefaultValue = 3D)]
-        [TypeConverter(typeof(DoubleConverter))]
-        public double DefaultWaitTimeout => (double) this["DefaultWaitTimeout"];
-
-        /// <summary>
-        /// Gets the setting for whether to delete all cookies from the page.
+        /// Gets the setting to set the DriverService log logging level.
         /// Default = false.
+        /// Verbose is DEBUG level, otherwise it is INFO level.
         /// </summary>
-        [ConfigurationProperty("DeleteAllCookies", IsRequired = false, DefaultValue = false)]
-        public bool DeleteAllCookies => (bool)this["DeleteAllCookies"];
+        [ConfigurationProperty("EnableVerboseLogging", IsRequired = false, DefaultValue = false)]
+        public bool EnableVerboseLogging => (bool)this["EnableVerboseLogging"];
+        #endregion
+
+        #region WEBDRIVER BROWSER SETTINGS
 
         /// <summary>
         /// Gets the setting for the URL of the page the browser will be navigated to on launch.
@@ -81,13 +55,53 @@ namespace Test.Automation.Selenium.Settings
         public string InitialBrowserUrl => (string)this["InitialBrowserUrl"];
 
         /// <summary>
-        /// Gets the EnableVerboseLogging setting for DriverService logging.
-        /// Default = false.
-        /// Verbose is DEBUG level, otherwise it is INFO level.
+        /// Get the PageLoadStategy for specifying the behavior of waiting for page loads in the driver.
+        /// [ Default | *Normal | Eager | None ]
+        /// Default = PageLoadStrategy.Normal.
         /// </summary>
-        [ConfigurationProperty("EnableVerboseLogging", IsRequired = false, DefaultValue = false)]
-        public bool EnableVerboseLogging => (bool)this["EnableVerboseLogging"];
+        [ConfigurationProperty("PageLoadStrategy", IsRequired = false, DefaultValue = PageLoadStrategy.Normal)]
+        [TypeConverter(typeof(CustomPageLoadStrategyConverter))]
+        public PageLoadStrategy PageLoadStrategy => (PageLoadStrategy)this["PageLoadStrategy"];
 
+        /// <summary>
+        /// Gets the setting for the default WebDriver Wait timeout value (in seconds).
+        /// Default = 3D (double).
+        /// </summary>
+        [ConfigurationProperty("DefaultWaitTimeout", IsRequired = false, DefaultValue = 3D)]
+        [TypeConverter(typeof(DoubleConverter))]
+        public double DefaultWaitTimeout => (double)this["DefaultWaitTimeout"];
+
+        /// <summary>
+        /// Gets the setting for whether to delete all cookies from the page.
+        /// Default = false.
+        /// </summary>
+        [ConfigurationProperty("DeleteAllCookies", IsRequired = false, DefaultValue = false)]
+        public bool DeleteAllCookies => (bool)this["DeleteAllCookies"];
+
+        /// <summary>
+        /// Gets browser window IsMaximized status.
+        /// This setting overrides WindowPosition and WindowSize settings.
+        /// Default = false.
+        /// </summary>
+        [ConfigurationProperty("IsMaximized", IsRequired = false, DefaultValue = false)]
+        public bool IsMaximized => (bool)this["IsMaximized"];
+
+        /// <summary>
+        /// Gets the WebDriver browser starting window size. 
+        /// Default = "1600, 900".
+        /// </summary>
+        [ConfigurationProperty("Size", IsRequired = false, DefaultValue = "1600, 900")]
+        [TypeConverter(typeof(CustomSizeConverter))]
+        public Size Size => (Size)this["Size"];
+
+        /// <summary>
+        /// Gets the WebDriver browser starting window position.
+        /// Default = "10, 10".
+        /// </summary>
+        [ConfigurationProperty("Position", IsRequired = false, DefaultValue = "10, 10")]
+        [TypeConverter(typeof(CustomPointConverter))]
+        public Point Position => (Point)this["Position"];
+        
         /// <summary>
         /// Gets the LogLevel setting to determine levels of logging available to WebDriver instances (usually BROWSER and DRIVER.)
         /// Default = LogLevel.Warning. (Chrome only.)
@@ -97,18 +111,10 @@ namespace Test.Automation.Selenium.Settings
         [TypeConverter(typeof(CustomLogLevelConverter))]
         public LogLevel LogLevel => (LogLevel)this["LogLevel"];
 
-        /// <summary>
-        /// Get the PageLoadStategy for specifying the behavior of waiting for page loads in the driver.
-        /// [ Default | *Normal | Eager | None ]
-        /// Default = PageLoadStrategy.Normal.
-        /// </summary>
-        [ConfigurationProperty("PageLoadStrategy", IsRequired = false, DefaultValue = PageLoadStrategy.Normal)]
-        [TypeConverter(typeof(CustomPageLoadStrategyConverter))]
-        public PageLoadStrategy PageLoadStrategy => (PageLoadStrategy)this["PageLoadStrategy"];
-        
-        /**********************************************************************
-         * CHROME ONLY.
-         * *******************************************************************/
+        #endregion
+
+        #region CHROME ONLY SETTINGS
+
         /// <summary>
         /// Gets the setting for running Chrome in a headless environment. (Chrome only.)
         /// Default = false.
@@ -122,10 +128,10 @@ namespace Test.Automation.Selenium.Settings
         /// </summary>
         [ConfigurationProperty("DownloadDefaultDir", IsRequired = false, DefaultValue = null)]
         public string DownloadDefaultDir => (string)this["DownloadDefaultDir"];
+        #endregion
 
-        /**********************************************************************
-         * INTERNET EXPLORER ONLY.
-         * *******************************************************************/
+        #region INTERNET EXPLORERE ONLY SETTINGS
+
         /// <summary>
         /// Gets the setting for whether to clear the Internet Explorer cache before launching the browser. (IE only.)
         /// Default = false.
@@ -141,5 +147,6 @@ namespace Test.Automation.Selenium.Settings
         /// </summary>
         [ConfigurationProperty("IgnoreProtectedModeSettings", IsRequired = false, DefaultValue = false)]
         public bool IgnoreProtectedModeSettings => (bool)this["IgnoreProtectedModeSettings"];
+        #endregion
     }
 }

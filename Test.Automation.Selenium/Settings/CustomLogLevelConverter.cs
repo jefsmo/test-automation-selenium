@@ -48,9 +48,7 @@ namespace Test.Automation.Selenium.Settings
         {
             ValidateType(value, typeof(LogLevel));
 
-            var data = ((LogLevel)value);
-
-            return data.ToString();
+            return ((LogLevel)value).ToString();
         }
 
         /// <summary>

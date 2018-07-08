@@ -47,9 +47,7 @@ namespace Test.Automation.Selenium.Settings
         {
             ValidateType(value, typeof(PageLoadStrategy));
 
-            var data = ((PageLoadStrategy)value);
-
-            return data.ToString();
+            return ((PageLoadStrategy)value).ToString();
         }
 
         /// <summary>

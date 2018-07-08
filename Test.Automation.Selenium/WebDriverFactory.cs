@@ -9,6 +9,7 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.IE;
 using OpenQA.Selenium.Remote;
+using Test.Automation.Base;
 using Test.Automation.Selenium.Settings;
 
 namespace Test.Automation.Selenium
@@ -131,7 +132,7 @@ namespace Test.Automation.Selenium
             // Headless Chrome setting.
             if (browserSettings.IsHeadless)
             {
-                var resolution = Screen.PrimaryScreen.Bounds;
+                var boundsRectangle = Screen.PrimaryScreen.Bounds;
 
                 // Force Chrome to start maximized when headless.
                 args.AddRange(new List<string>
@@ -141,7 +142,7 @@ namespace Test.Automation.Selenium
                     "disable-gpu",
                     "start-maximized",
                     // BUG: Chrome requires window-size in headless mode.
-                    $"window-size={resolution.Width + ", " + resolution.Height}"
+                    $"window-size={boundsRectangle.Width + "," + boundsRectangle.Height}"
                 });
             }
             else if (browserSettings.IsMaximized)
@@ -150,6 +151,7 @@ namespace Test.Automation.Selenium
             }
             else
             {
+                // Prevents the browser from moving or changing size after it first opens.
                 args.Add($"window-position={browserSettings.Position.X},{browserSettings.Position.Y}");
                 args.Add($"window-size={browserSettings.Size.Width},{browserSettings.Size.Height}");
             }
@@ -161,16 +163,20 @@ namespace Test.Automation.Selenium
 
             chromeOptions.AddArguments(args);
 
+            /******************************************************************
+             * chrome.exe https://www.bing.com  <=== this only works on the command line!
+             * Default behavior: The 'data;' URL is the default address while launching chrome after which it navigates to the given url.
+             * --homepage: Specifies which page will be displayed in newly-opened tabs; must manually open tab...
+             * --app: Specifies that the associated value should be launched in "application" mode.
+             * --new-window: Launches URL in new browser window; opens 2nd tab with new URL...
+             * chromeOptions.AddArgument($"{browserSettings.InitialBrowserUrl}"); gets treated as an argument, not a URL: --https:www.bing.com instead of https://www.bing.com
+             *
+             *
+             * ***************************************************************/
+
             // TODO:  Chrome start page setting does not seem to work...
-            //if (! string.IsNullOrEmpty(browserSettings.InitialBrowserUrl))
+            //if (!string.IsNullOrEmpty(browserSettings.InitialBrowserUrl))
             //{
-            // chrome.exe https://www.bing.com  <=== this only works on the command line!
-            // Default behavior: The 'data:,' URL is the default address while launching chrome after which it navigates to the given url.
-            // --homepage: Specifies which page will be displayed in newly-opened tabs; must manually open tab...
-            // --app: Specifies that the associated value should be launched in "application" mode.
-            // --new-window: Launches URL in new browser window; opens 2nd tab with new URL...
-            // 
-            //chromeOptions.AddArgument($"{browserSettings.InitialBrowserUrl}"); gets treated as an argument, not a URL: --https:www.bing.com instead of https://www.bing.com
             //}
 
             // Chrome DownloadDefaultDir setting.
@@ -211,7 +217,7 @@ namespace Test.Automation.Selenium
 
             var ieOptions = new InternetExplorerOptions
             {
-                EnsureCleanSession = browserSettings.EnsureCleanSession,  // Clears the IE cache.
+                EnsureCleanSession = browserSettings.EnsureCleanSession,  // Clears the IE cache. May delay browser loading.
                 IgnoreZoomLevel = false,    // The IE zoom level should be set to 100% or the driver may not interact with page controls correctly.
                 PageLoadStrategy = browserSettings.PageLoadStrategy,
                 InitialBrowserUrl = browserSettings.InitialBrowserUrl,
